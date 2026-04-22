@@ -14,8 +14,11 @@ use Magento\Framework\Setup\Patch\DataPatchInterface;
 /**
  * Install product and category OG attributes (og_title, og_description,
  * og_image) under the "Search Engine Optimization" group on every attribute
- * set. Depends on AdvancedSEO's AddSeoNameAttribute so the SEO group exists
- * with seo_name already attached.
+ * set.
+ *
+ * Self-sufficient after the split: the "Search Engine Optimization" group
+ * is created here if it does not already exist, so this patch no longer
+ * depends on Panth_AdvancedSEO's AddSeoNameAttribute patch.
  */
 class AddOgAttributes implements DataPatchInterface
 {
@@ -117,11 +120,7 @@ class AddOgAttributes implements DataPatchInterface
      */
     public static function getDependencies(): array
     {
-        return [
-            // Ensure AdvancedSEO has created the SEO group + seo_name first
-            // so our attributes land in the correct group/position.
-            \Panth\AdvancedSEO\Setup\Patch\Data\AddSeoNameAttribute::class,
-        ];
+        return [];
     }
 
     /**
@@ -131,11 +130,6 @@ class AddOgAttributes implements DataPatchInterface
      */
     public function getAliases(): array
     {
-        return [
-            // Accept the original AdvancedSEO-namespaced class as an alias so
-            // installs that have already applied the AdvancedSEO patch do not
-            // re-run this patch after the split.
-            \Panth\AdvancedSEO\Setup\Patch\Data\AddOgAttributes::class,
-        ];
+        return [];
     }
 }

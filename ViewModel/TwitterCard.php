@@ -6,11 +6,13 @@ namespace Panth\SocialMeta\ViewModel;
 use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\View\Element\Block\ArgumentInterface;
 use Magento\Store\Model\ScopeInterface;
-use Panth\AdvancedSEO\Helper\Config;
 use Panth\SocialMeta\Model\Social\TwitterCardResolver;
 
 /**
  * Hyva-safe ViewModel exposing Twitter Card tags to templates.
+ *
+ * Previously gated by Panth_AdvancedSEO's master switch; after the split
+ * this module owns its own enable flag on `panth_social_meta/social/twitter_enabled`.
  */
 class TwitterCard implements ArgumentInterface
 {
@@ -18,12 +20,10 @@ class TwitterCard implements ArgumentInterface
 
     /**
      * @param TwitterCardResolver $twitterCardResolver
-     * @param Config $config Shared Advanced SEO master-switch helper.
      * @param ScopeConfigInterface $scopeConfig
      */
     public function __construct(
         private readonly TwitterCardResolver $twitterCardResolver,
-        private readonly Config $config,
         private readonly ScopeConfigInterface $scopeConfig
     ) {
     }
@@ -36,8 +36,7 @@ class TwitterCard implements ArgumentInterface
     public function isEnabled(): bool
     {
         try {
-            return $this->config->isEnabled()
-                && $this->scopeConfig->isSetFlag(self::XML_TWITTER_ENABLED, ScopeInterface::SCOPE_STORE);
+            return $this->scopeConfig->isSetFlag(self::XML_TWITTER_ENABLED, ScopeInterface::SCOPE_STORE);
         } catch (\Throwable) {
             return false;
         }

@@ -8,7 +8,6 @@ use Magento\Framework\Event\Observer;
 use Magento\Framework\Event\ObserverInterface;
 use Magento\Framework\View\LayoutInterface;
 use Magento\Store\Model\ScopeInterface;
-use Panth\AdvancedSEO\Helper\Config as SeoConfig;
 use Psr\Log\LoggerInterface;
 
 /**
@@ -62,12 +61,10 @@ class RemoveNativeOgObserver implements ObserverInterface
     /**
      * @param ScopeConfigInterface $scopeConfig
      * @param LoggerInterface $logger
-     * @param SeoConfig $seoConfig Shared Advanced SEO master-switch helper.
      */
     public function __construct(
         private readonly ScopeConfigInterface $scopeConfig,
-        private readonly LoggerInterface $logger,
-        private readonly SeoConfig $seoConfig
+        private readonly LoggerInterface $logger
     ) {
     }
 
@@ -79,10 +76,6 @@ class RemoveNativeOgObserver implements ObserverInterface
      */
     public function execute(Observer $observer): void
     {
-        if (!$this->seoConfig->isEnabled()) {
-            return;
-        }
-
         if (!$this->isOgEnabled()) {
             return;
         }

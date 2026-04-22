@@ -3,41 +3,44 @@ declare(strict_types=1);
 
 namespace Panth\SocialMeta\Model\Social;
 
+use Magento\Catalog\Model\Category;
 use Magento\Catalog\Model\Product;
 use Magento\Cms\Model\Page as CmsPage;
 use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\Registry;
+use Magento\Framework\UrlInterface;
 use Magento\Framework\View\Page\Config as PageConfig;
 use Magento\Store\Model\ScopeInterface;
 use Magento\Store\Model\StoreManagerInterface;
-use Panth\AdvancedSEO\Api\CanonicalResolverInterface;
-use Panth\AdvancedSEO\Api\MetaResolverInterface;
-use Panth\AdvancedSEO\Api\Data\ResolvedMetaInterface;
 
 /**
  * Resolves Open Graph meta-tag data from the current page context.
  *
- * Pulls canonical URLs and template-rendered meta from Panth_AdvancedSEO's
- * public API interfaces so og:url / og:title / og:description stay in sync
- * with the visible <title> and <meta name="description"> tags.
+ * NOTE: after the AdvancedSEO split this module is self-contained and
+ * no longer depends on Panth\AdvancedSEO\* API interfaces. Canonical
+ * URLs are built locally from the entity's own URL model, and meta
+ * title/description fall back to the entity's native getMetaTitle() /
+ * getMetaDescription() plus the PageConfig title/description set by
+ * the controller. Advanced template-rendered meta (rule-engine, template
+ * precedence) that lived in Panth_AdvancedSEO is no longer used here.
  */
 class OpenGraphResolver
 {
+    public const ENTITY_PRODUCT  = 'product';
+    public const ENTITY_CATEGORY = 'category';
+    public const ENTITY_CMS      = 'cms';
+
     public const XML_DEFAULT_OG_IMAGE = 'panth_social_meta/social/default_og_image';
 
     /**
      * @param Registry $registry
      * @param StoreManagerInterface $storeManager
-     * @param CanonicalResolverInterface $canonicalResolver
-     * @param MetaResolverInterface $metaResolver
      * @param ScopeConfigInterface $scopeConfig
      * @param PageConfig|null $pageConfig Injected as Proxy via di.xml.
      */
     public function __construct(
         private readonly Registry $registry,
         private readonly StoreManagerInterface $storeManager,
-        private readonly CanonicalResolverInterface $canonicalResolver,
-        private readonly MetaResolverInterface $metaResolver,
         private readonly ScopeConfigInterface $scopeConfig,
         private readonly ?PageConfig $pageConfig = null
     ) {
@@ -59,22 +62,16 @@ class OpenGraphResolver
 
         [$entityType, $entityId] = $this->detectEntity();
 
-        // Load the resolved meta for this entity so we can fall back to its
-        // title/description when the entity itself has no own value. This
-        // guarantees og:title / og:description are populated using the same
-        // template-rendered text the page <title> and meta description use.
-        $resolvedMeta = $this->loadResolvedMeta($entityType, $entityId, $storeId);
-
         $tags = [];
         $tags['og:type'] = $this->resolveType($entityType);
-        $tags['og:title'] = $this->resolveTitle($entityType, $resolvedMeta);
-        $tags['og:description'] = $this->resolveDescription($entityType, $resolvedMeta);
+        $tags['og:title'] = $this->resolveTitle($entityType);
+        $tags['og:description'] = $this->resolveDescription($entityType);
         $tags['og:image'] = $this->resolveImage($entityType);
         $tags['og:url'] = $this->resolveUrl($entityType, $entityId, $storeId);
         $tags['og:site_name'] = $this->resolveSiteName();
 
         // Facebook Shop / product-catalog ingesters require these on PDP.
-        if ($entityType === MetaResolverInterface::ENTITY_PRODUCT) {
+        if ($entityType === self::ENTITY_PRODUCT) {
             foreach ($this->resolveProductPriceTags() as $property => $value) {
                 $tags[$property] = $value;
             }
@@ -126,26 +123,6 @@ class OpenGraphResolver
     }
 
     /**
-     * Load the resolved meta DTO for the current entity, or null if none.
-     *
-     * @param string|null $entityType
-     * @param int $entityId
-     * @param int $storeId
-     * @return ResolvedMetaInterface|null
-     */
-    private function loadResolvedMeta(?string $entityType, int $entityId, int $storeId): ?ResolvedMetaInterface
-    {
-        if ($entityType === null || $entityId === 0) {
-            return null;
-        }
-        try {
-            return $this->metaResolver->resolve($entityType, $entityId, $storeId);
-        } catch (\Throwable) {
-            return null;
-        }
-    }
-
-    /**
      * Map entity type to OG type value.
      *
      * @param string|null $entityType
@@ -154,8 +131,8 @@ class OpenGraphResolver
     private function resolveType(?string $entityType): string
     {
         return match ($entityType) {
-            MetaResolverInterface::ENTITY_PRODUCT => 'product',
-            MetaResolverInterface::ENTITY_CMS => 'article',
+            self::ENTITY_PRODUCT => 'product',
+            self::ENTITY_CMS => 'article',
             default => 'website',
         };
     }
@@ -163,54 +140,45 @@ class OpenGraphResolver
     /**
      * Resolve title from current entity or page config.
      *
-     * Falls back through: explicit entity meta_title -> resolved meta from
-     * MetaResolver (template-rendered) -> entity name -> store name.
+     * Fallback chain: entity own meta_title -> entity name/title -> page
+     * config title set by controller -> store name. Template-rendered
+     * meta (previously sourced from Panth_AdvancedSEO's MetaResolver) is
+     * no longer available after the split.
      *
      * @param string|null $entityType
-     * @param ResolvedMetaInterface|null $resolvedMeta
      * @return string
      */
-    private function resolveTitle(?string $entityType, ?ResolvedMetaInterface $resolvedMeta): string
+    private function resolveTitle(?string $entityType): string
     {
         $product = $this->registry->registry('current_product');
-        if ($entityType === MetaResolverInterface::ENTITY_PRODUCT && $product instanceof Product) {
+        if ($entityType === self::ENTITY_PRODUCT && $product instanceof Product) {
             $own = (string) $product->getMetaTitle();
             if ($own !== '') {
                 return $own;
-            }
-            if ($resolvedMeta !== null && (string) $resolvedMeta->getMetaTitle() !== '') {
-                return (string) $resolvedMeta->getMetaTitle();
             }
             return (string) $product->getName();
         }
 
         $category = $this->registry->registry('current_category');
-        if ($entityType === MetaResolverInterface::ENTITY_CATEGORY && $category !== null) {
+        if ($entityType === self::ENTITY_CATEGORY && $category !== null) {
             $own = (string) $category->getMetaTitle();
             if ($own !== '') {
                 return $own;
-            }
-            if ($resolvedMeta !== null && (string) $resolvedMeta->getMetaTitle() !== '') {
-                return (string) $resolvedMeta->getMetaTitle();
             }
             return (string) $category->getName();
         }
 
         $cmsPage = $this->registry->registry('cms_page');
-        if ($entityType === MetaResolverInterface::ENTITY_CMS && $cmsPage instanceof CmsPage) {
+        if ($entityType === self::ENTITY_CMS && $cmsPage instanceof CmsPage) {
             $own = (string) $cmsPage->getMetaTitle();
             if ($own !== '') {
                 return $own;
-            }
-            if ($resolvedMeta !== null && (string) $resolvedMeta->getMetaTitle() !== '') {
-                return (string) $resolvedMeta->getMetaTitle();
             }
             return (string) $cmsPage->getTitle();
         }
 
         // Fallback for pages without a catalog/CMS entity (e.g. custom
-        // controllers such as Panth_Testimonials, Panth_Faq, static routes):
-        // prefer the page title set on the PageConfig by the controller so
+        // controllers): prefer the page title set on PageConfig so
         // the og:title reflects the actual page rather than the store name.
         $pageTitle = $this->getPageConfigTitle();
         if ($pageTitle !== '') {
@@ -264,36 +232,30 @@ class OpenGraphResolver
     /**
      * Resolve meta description from current entity.
      *
-     * Falls back through: explicit entity meta_description -> resolved meta
-     * from MetaResolver (template-rendered with current store context) ->
-     * entity description -> store default description.
+     * Fallback chain: entity own meta_description -> product short
+     * description / category description -> page config description ->
+     * store default description. Template-rendered meta from Panth_
+     * AdvancedSEO's MetaResolver is no longer consulted after the split.
      *
      * @param string|null $entityType
-     * @param ResolvedMetaInterface|null $resolvedMeta
      * @return string
      */
-    private function resolveDescription(?string $entityType, ?ResolvedMetaInterface $resolvedMeta): string
+    private function resolveDescription(?string $entityType): string
     {
         $product = $this->registry->registry('current_product');
-        if ($entityType === MetaResolverInterface::ENTITY_PRODUCT && $product instanceof Product) {
+        if ($entityType === self::ENTITY_PRODUCT && $product instanceof Product) {
             $own = (string) $product->getMetaDescription();
             if ($own !== '') {
                 return $this->truncate($own, 200);
-            }
-            if ($resolvedMeta !== null && (string) $resolvedMeta->getMetaDescription() !== '') {
-                return $this->truncate((string) $resolvedMeta->getMetaDescription(), 200);
             }
             return $this->truncate((string) $product->getShortDescription(), 200);
         }
 
         $category = $this->registry->registry('current_category');
-        if ($entityType === MetaResolverInterface::ENTITY_CATEGORY && $category !== null) {
+        if ($entityType === self::ENTITY_CATEGORY && $category !== null) {
             $own = (string) $category->getMetaDescription();
             if ($own !== '') {
                 return $this->truncate($own, 200);
-            }
-            if ($resolvedMeta !== null && (string) $resolvedMeta->getMetaDescription() !== '') {
-                return $this->truncate((string) $resolvedMeta->getMetaDescription(), 200);
             }
             return $this->truncate((string) $category->getDescription(), 200);
         }
@@ -303,9 +265,6 @@ class OpenGraphResolver
             $own = (string) $cmsPage->getMetaDescription();
             if ($own !== '') {
                 return $this->truncate($own, 200);
-            }
-            if ($resolvedMeta !== null && (string) $resolvedMeta->getMetaDescription() !== '') {
-                return $this->truncate((string) $resolvedMeta->getMetaDescription(), 200);
             }
             return '';
         }
@@ -325,8 +284,8 @@ class OpenGraphResolver
 
     /**
      * Resolve image URL with progressive fallbacks:
-     *   product image -> category image -> first product in category -> store logo
-     *   -> Magento default product placeholder -> empty.
+     *   product image -> category image -> first product in category -> default OG image
+     *   -> store logo -> Magento default product placeholder -> empty.
      *
      * @param string|null $entityType
      * @return string
@@ -335,17 +294,17 @@ class OpenGraphResolver
     {
         try {
             $product = $this->registry->registry('current_product');
-            if ($entityType === MetaResolverInterface::ENTITY_PRODUCT && $product instanceof Product) {
+            if ($entityType === self::ENTITY_PRODUCT && $product instanceof Product) {
                 $image = $product->getImage();
                 if ($image && $image !== 'no_selection') {
                     $store = $this->storeManager->getStore();
-                    $mediaUrl = rtrim((string) $store->getBaseUrl(\Magento\Framework\UrlInterface::URL_TYPE_MEDIA), '/');
+                    $mediaUrl = rtrim((string) $store->getBaseUrl(UrlInterface::URL_TYPE_MEDIA), '/');
                     return $mediaUrl . '/catalog/product' . $image;
                 }
             }
 
             $category = $this->registry->registry('current_category');
-            if ($entityType === MetaResolverInterface::ENTITY_CATEGORY && $category !== null) {
+            if ($entityType === self::ENTITY_CATEGORY && $category !== null) {
                 $categoryImage = $category->getImageUrl();
                 if ($categoryImage) {
                     return (string) $categoryImage;
@@ -398,7 +357,7 @@ class OpenGraphResolver
                 $image = $product->getImage();
                 if ($image && $image !== 'no_selection') {
                     $store = $this->storeManager->getStore();
-                    $mediaUrl = rtrim((string) $store->getBaseUrl(\Magento\Framework\UrlInterface::URL_TYPE_MEDIA), '/');
+                    $mediaUrl = rtrim((string) $store->getBaseUrl(UrlInterface::URL_TYPE_MEDIA), '/');
                     return $mediaUrl . '/catalog/product' . $image;
                 }
             }
@@ -412,8 +371,8 @@ class OpenGraphResolver
      * Get the admin-configured default OG image URL.
      *
      * The stored value is a media-relative path saved by the Image backend
-     * under `panth_seo/og/`. We reject any value containing path-traversal
-     * sequences and return an absolute media URL when safe.
+     * under `panth_social_meta/social/`. We reject any value containing
+     * path-traversal sequences and return an absolute media URL when safe.
      *
      * @return string
      */
@@ -435,7 +394,7 @@ class OpenGraphResolver
                 return $relative;
             }
             $store = $this->storeManager->getStore();
-            $mediaUrl = rtrim((string) $store->getBaseUrl(\Magento\Framework\UrlInterface::URL_TYPE_MEDIA), '/');
+            $mediaUrl = rtrim((string) $store->getBaseUrl(UrlInterface::URL_TYPE_MEDIA), '/');
             return $mediaUrl . '/' . ltrim($relative, '/');
         } catch (\Throwable) {
             return '';
@@ -451,7 +410,7 @@ class OpenGraphResolver
     {
         try {
             $store = $this->storeManager->getStore();
-            $mediaUrl = rtrim((string) $store->getBaseUrl(\Magento\Framework\UrlInterface::URL_TYPE_MEDIA), '/');
+            $mediaUrl = rtrim((string) $store->getBaseUrl(UrlInterface::URL_TYPE_MEDIA), '/');
             $placeholder = $store->getConfig('catalog/placeholder/image_placeholder');
             if ($placeholder) {
                 return $mediaUrl . '/catalog/product/placeholder/' . ltrim((string) $placeholder, '/');
@@ -465,6 +424,12 @@ class OpenGraphResolver
     /**
      * Resolve canonical URL for the current entity.
      *
+     * Previously delegated to Panth_AdvancedSEO's CanonicalResolver which
+     * honoured custom-canonical overrides and parameter strip rules. After
+     * the split we build a minimal canonical locally from the entity's URL
+     * model; pages without a known entity fall back to the current URL with
+     * its query string stripped.
+     *
      * @param string|null $entityType
      * @param int $entityId
      * @param int $storeId
@@ -472,20 +437,71 @@ class OpenGraphResolver
      */
     private function resolveUrl(?string $entityType, int $entityId, int $storeId): string
     {
-        if ($entityType === null || $entityId === 0) {
-            try {
-                $currentUrl = (string) $this->storeManager->getStore()->getCurrentUrl(false);
-                return $this->canonicalResolver->normalize($currentUrl, $storeId);
-            } catch (\Throwable) {
-                return '';
+        try {
+            if ($entityType === self::ENTITY_PRODUCT) {
+                $product = $this->registry->registry('current_product');
+                if ($product instanceof Product) {
+                    $url = (string) $product->getProductUrl(false);
+                    if ($url !== '') {
+                        return $this->stripQuery($url);
+                    }
+                }
             }
+
+            if ($entityType === self::ENTITY_CATEGORY) {
+                $category = $this->registry->registry('current_category');
+                if ($category instanceof Category) {
+                    $url = (string) $category->getUrl();
+                    if ($url !== '') {
+                        return $this->stripQuery($url);
+                    }
+                }
+            }
+
+            if ($entityType === self::ENTITY_CMS) {
+                $cmsPage = $this->registry->registry('cms_page');
+                if ($cmsPage instanceof CmsPage) {
+                    try {
+                        $store = $this->storeManager->getStore();
+                        $base = rtrim((string) $store->getBaseUrl(), '/');
+                        $identifier = ltrim((string) $cmsPage->getIdentifier(), '/');
+                        if ($identifier !== '') {
+                            return $base . '/' . $identifier;
+                        }
+                    } catch (\Throwable) {
+                        // fall through to current URL
+                    }
+                }
+            }
+        } catch (\Throwable) {
+            // fall through to current URL
         }
 
         try {
-            return $this->canonicalResolver->getCanonicalUrl($entityType, $entityId, $storeId);
+            $currentUrl = (string) $this->storeManager->getStore()->getCurrentUrl(false);
+            return $this->stripQuery($currentUrl);
         } catch (\Throwable) {
             return '';
         }
+    }
+
+    /**
+     * Strip the query string and fragment from a URL for canonical use.
+     *
+     * @param string $url
+     * @return string
+     */
+    private function stripQuery(string $url): string
+    {
+        $q = strpos($url, '?');
+        if ($q !== false) {
+            $url = substr($url, 0, $q);
+        }
+        $f = strpos($url, '#');
+        if ($f !== false) {
+            $url = substr($url, 0, $f);
+        }
+        return $url;
     }
 
     /**
@@ -513,7 +529,7 @@ class OpenGraphResolver
             $store = $this->storeManager->getStore();
             $logoSrc = $store->getConfig('design/header/logo_src');
             if ($logoSrc) {
-                $mediaUrl = rtrim((string) $store->getBaseUrl(\Magento\Framework\UrlInterface::URL_TYPE_MEDIA), '/');
+                $mediaUrl = rtrim((string) $store->getBaseUrl(UrlInterface::URL_TYPE_MEDIA), '/');
                 return $mediaUrl . '/logo/' . ltrim((string) $logoSrc, '/');
             }
         } catch (\Throwable) {
@@ -532,17 +548,17 @@ class OpenGraphResolver
     {
         $product = $this->registry->registry('current_product');
         if ($product !== null && $product->getId()) {
-            return [MetaResolverInterface::ENTITY_PRODUCT, (int) $product->getId()];
+            return [self::ENTITY_PRODUCT, (int) $product->getId()];
         }
 
         $category = $this->registry->registry('current_category');
         if ($category !== null && $category->getId()) {
-            return [MetaResolverInterface::ENTITY_CATEGORY, (int) $category->getId()];
+            return [self::ENTITY_CATEGORY, (int) $category->getId()];
         }
 
         $cmsPage = $this->registry->registry('cms_page');
         if ($cmsPage !== null && $cmsPage->getId()) {
-            return [MetaResolverInterface::ENTITY_CMS, (int) $cmsPage->getId()];
+            return [self::ENTITY_CMS, (int) $cmsPage->getId()];
         }
 
         return [null, 0];
