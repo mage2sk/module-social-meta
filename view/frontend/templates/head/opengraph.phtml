@@ -1,0 +1,19 @@
+<?php
+/** @var \Panth\SocialMeta\Block\Head\OpenGraph $block */
+/** @var \Magento\Framework\Escaper $escaper */
+
+if (!$block->isEnabled()) {
+    return;
+}
+
+$tags = $block->getTags();
+if ($tags === []) {
+    return;
+}
+foreach ($tags as $property => $content) {
+    $content = trim((string) $content);
+    if ($content === '') {
+        continue;
+    }
+    echo '<meta property="' . $escaper->escapeHtml($property) . '" content="' . $escaper->escapeHtmlAttr($content) . '" />' . "\n";
+}

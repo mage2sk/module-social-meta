@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Panth Social Meta — ACL.
+ *
+ * Gates the system.xml "Social / Open Graph" group under the standard
+ * Stores > Configuration ACL branch.
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:Acl/etc/acl.xsd">
+    <acl>
+        <resources>
+            <resource id="Magento_Backend::admin">
+                <resource id="Magento_Backend::stores">
+                    <resource id="Magento_Backend::stores_settings">
+                        <resource id="Magento_Config::config">
+                            <resource id="Panth_SocialMeta::config"
+                                      title="Panth Social Meta Configuration"
+                                      sortOrder="410"/>
+                        </resource>
+                    </resource>
+                </resource>
+            </resource>
+        </resources>
+    </acl>
+</config>

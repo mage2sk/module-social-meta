@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Panth Social Meta — Module declaration.
+ *
+ * Extracts OpenGraph + Twitter Card head-tag emission from Panth_AdvancedSEO
+ * into a standalone module. Reuses the existing `panth_seo` configuration
+ * section and the AdvancedSEO canonical/meta resolvers so tags remain
+ * consistent with Page <title>, meta description, and canonical URL.
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:Module/etc/module.xsd">
+    <module name="Panth_SocialMeta" setup_version="1.0.0">
+        <sequence>
+            <module name="Panth_Core"/>
+            <module name="Panth_AdvancedSEO"/>
+            <module name="Magento_Catalog"/>
+            <module name="Magento_Cms"/>
+        </sequence>
+    </module>
+</config>

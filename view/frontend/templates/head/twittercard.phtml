@@ -1,0 +1,19 @@
+<?php
+/** @var \Panth\SocialMeta\Block\Head\TwitterCard $block */
+/** @var \Magento\Framework\Escaper $escaper */
+
+if (!$block->isEnabled()) {
+    return;
+}
+
+$tags = $block->getTags();
+if ($tags === []) {
+    return;
+}
+foreach ($tags as $name => $content) {
+    $content = trim((string) $content);
+    if ($content === '') {
+        continue;
+    }
+    echo '<meta name="' . $escaper->escapeHtml($name) . '" content="' . $escaper->escapeHtmlAttr($content) . '" />' . "\n";
+}

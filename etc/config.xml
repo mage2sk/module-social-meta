@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Panth Social Meta — Default values for panth_seo/social/* fields.
+ *
+ * Defaults are kept on the shared `panth_seo` section so the admin UI
+ * stays grouped under Advanced SEO. If AdvancedSEO is not installed,
+ * these defaults still apply for the Social Meta module's own reads.
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Store:etc/config.xsd">
+    <default>
+        <panth_social_meta>
+            <social>
+                <og_enabled>1</og_enabled>
+                <twitter_enabled>1</twitter_enabled>
+                <twitter_card_type>summary_large_image</twitter_card_type>
+                <twitter_site_handle></twitter_site_handle>
+                <default_og_image></default_og_image>
+            </social>
+        </panth_social_meta>
+    </default>
+</config>

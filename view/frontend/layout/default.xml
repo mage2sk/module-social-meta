@@ -1,0 +1,33 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Panth Social Meta — default layout.
+ *
+ * Registers two head blocks: OpenGraph and TwitterCard. Rendered inside
+ * <head> via the `head.additional` container. Templates are cacheable and
+ * produce zero JS, zero x-magento-init output — Hyva and Luma safe.
+ */
+-->
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <body>
+        <referenceBlock name="head.additional">
+            <block class="Panth\SocialMeta\Block\Head\OpenGraph"
+                   name="panth_social_meta.opengraph"
+                   template="Panth_SocialMeta::head/opengraph.phtml"
+                   cacheable="true">
+                <arguments>
+                    <argument name="view_model" xsi:type="object">Panth\SocialMeta\ViewModel\OpenGraph</argument>
+                </arguments>
+            </block>
+            <block class="Panth\SocialMeta\Block\Head\TwitterCard"
+                   name="panth_social_meta.twittercard"
+                   template="Panth_SocialMeta::head/twittercard.phtml"
+                   cacheable="true">
+                <arguments>
+                    <argument name="view_model" xsi:type="object">Panth\SocialMeta\ViewModel\TwitterCard</argument>
+                </arguments>
+            </block>
+        </referenceBlock>
+    </body>
+</page>

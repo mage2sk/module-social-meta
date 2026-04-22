@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Panth Social Meta — DI configuration.
+ *
+ * OpenGraphResolver needs PageConfig to fall back to the controller-set
+ * title/description on routes without a catalog/CMS entity in the
+ * registry. Direct injection causes a circular dependency because
+ * PageConfig::build() builds the layout, which instantiates the resolver
+ * via the ViewModel during head assembly. Injecting a Proxy defers
+ * resolution until the value is used.
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+    <type name="Panth\SocialMeta\Model\Social\OpenGraphResolver">
+        <arguments>
+            <argument name="pageConfig" xsi:type="object">Magento\Framework\View\Page\Config\Proxy</argument>
+        </arguments>
+    </type>
+</config>

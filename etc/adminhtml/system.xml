@@ -1,0 +1,51 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Panth Social Meta — System configuration.
+ *
+ * Re-declares section `panth_seo` so that Magento merges this group into
+ * the existing Advanced SEO section (tab: panth). Only the Social / Open
+ * Graph group is defined here; all other panth_seo groups live in
+ * Panth_AdvancedSEO.
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
+    <system>
+        <section id="panth_social_meta" translate="label" sortOrder="85" showInDefault="1" showInWebsite="1" showInStore="1">
+            <class>separator-top</class>
+            <label>Social Meta</label>
+            <tab>panth</tab>
+            <resource>Panth_SocialMeta::config</resource>
+
+            <group id="social" translate="label" sortOrder="35" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>Social / Open Graph</label>
+                <field id="og_enabled" translate="label comment" type="select" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Enable Open Graph Tags</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment>Outputs og:title, og:description, og:image, and og:url meta tags for rich social media previews (Facebook, LinkedIn, etc.).</comment>
+                </field>
+                <field id="twitter_enabled" translate="label comment" type="select" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Enable Twitter Card Tags</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment>Outputs twitter:card, twitter:title, twitter:description, and twitter:image meta tags for Twitter/X link previews.</comment>
+                </field>
+                <field id="twitter_card_type" translate="label comment" type="select" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Twitter Card Type</label>
+                    <source_model>Panth\SocialMeta\Model\Config\Source\TwitterCardType</source_model>
+                    <comment>summary_large_image shows a large featured image; summary shows a smaller thumbnail.</comment>
+                </field>
+                <field id="twitter_site_handle" translate="label" type="text" sortOrder="40" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Twitter Site Handle</label>
+                    <comment>e.g. @yourstore</comment>
+                </field>
+                <field id="default_og_image" translate="label" type="image" sortOrder="50" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Default OG Image</label>
+                    <backend_model>Magento\Config\Model\Config\Backend\Image</backend_model>
+                    <upload_dir config="system/filesystem/media" scope_info="1">panth_seo/og</upload_dir>
+                    <base_url type="media" scope_info="1">panth_seo/og</base_url>
+                </field>
+            </group>
+        </section>
+    </system>
+</config>
