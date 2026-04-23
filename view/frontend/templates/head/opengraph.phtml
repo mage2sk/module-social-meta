@@ -2,6 +2,16 @@
 /** @var \Panth\SocialMeta\Block\Head\OpenGraph $block */
 /** @var \Magento\Framework\Escaper $escaper */
 
+/**
+ * Panth Social Meta — OpenGraph tag renderer.
+ *
+ * URL-valued properties (og:url, og:image, secure variants) are escaped
+ * with escapeUrl() which preserves `:` and `/` so scrapers see a clean
+ * URL. Text-valued properties (title, description, site_name, type,
+ * locale) use escapeHtmlAttr() which is HTML-attribute-safe without
+ * over-escaping characters that are valid inside a quoted attribute.
+ */
+
 if (!$block->isEnabled()) {
     return;
 }
@@ -10,10 +20,24 @@ $tags = $block->getTags();
 if ($tags === []) {
     return;
 }
+
+$urlProperties = [
+    'og:url'              => true,
+    'og:image'            => true,
+    'og:image:secure_url' => true,
+    'og:image:url'        => true,
+    'og:video'            => true,
+    'og:audio'            => true,
+];
+
 foreach ($tags as $property => $content) {
     $content = trim((string) $content);
     if ($content === '') {
         continue;
     }
-    echo '<meta property="' . $escaper->escapeHtml($property) . '" content="' . $escaper->escapeHtmlAttr($content) . '" />' . "\n";
+    $escapedContent = isset($urlProperties[$property])
+        ? $escaper->escapeUrl($content)
+        : $escaper->escapeHtmlAttr($content);
+
+    echo '<meta property="' . $escaper->escapeHtml($property) . '" content="' . $escapedContent . '" />' . "\n";
 }

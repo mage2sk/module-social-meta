@@ -5,7 +5,6 @@ namespace Panth\SocialMeta\Model\Social;
 
 use Magento\Catalog\Model\Category;
 use Magento\Catalog\Model\Product;
-use Magento\Cms\Model\Page as CmsPage;
 use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\Registry;
 use Magento\Framework\UrlInterface;
@@ -28,7 +27,6 @@ class OpenGraphResolver
 {
     public const ENTITY_PRODUCT  = 'product';
     public const ENTITY_CATEGORY = 'category';
-    public const ENTITY_CMS      = 'cms';
 
     public const XML_DEFAULT_OG_IMAGE = 'panth_social_meta/social/default_og_image';
 
@@ -63,16 +61,17 @@ class OpenGraphResolver
         [$entityType, $entityId] = $this->detectEntity();
 
         $tags = [];
-        $tags['og:type'] = $this->resolveType($entityType);
-        $tags['og:title'] = $this->resolveTitle($entityType);
+        $tags['og:type']        = $this->resolveType($entityType);
+        $tags['og:title']       = $this->resolveTitle($entityType);
         $tags['og:description'] = $this->resolveDescription($entityType);
-        $tags['og:image'] = $this->resolveImage($entityType);
-        $tags['og:url'] = $this->resolveUrl($entityType, $entityId, $storeId);
-        $tags['og:site_name'] = $this->resolveSiteName();
+        $tags['og:image']       = $this->resolveImage($entityType);
+        $tags['og:url']         = $this->resolveUrl($entityType, $entityId, $storeId);
+        $tags['og:site_name']   = $this->resolveSiteName($storeId);
+        $tags['og:locale']      = $this->resolveLocale($storeId);
 
-        // Facebook Shop / product-catalog ingesters require these on PDP.
+        // Facebook Shop / product-catalog ingesters require product:* tags on PDP.
         if ($entityType === self::ENTITY_PRODUCT) {
-            foreach ($this->resolveProductPriceTags() as $property => $value) {
+            foreach ($this->resolveProductTags() as $property => $value) {
                 $tags[$property] = $value;
             }
         }
@@ -81,18 +80,39 @@ class OpenGraphResolver
     }
 
     /**
-     * Resolve product:price:amount / product:price:currency for the current
-     * PDP. Returns an empty array when no current_product is in registry or
-     * the final price is non-positive (e.g. typeless/virtual edge cases).
+     * Locale code formatted the way the OpenGraph spec wants: `en_US`.
+     * Magento stores it as `en_US` internally already, so this is a pure
+     * passthrough with a safe default.
+     */
+    private function resolveLocale(int $storeId): string
+    {
+        try {
+            $locale = (string) $this->scopeConfig->getValue(
+                'general/locale/code',
+                ScopeInterface::SCOPE_STORE,
+                $storeId
+            );
+            return $locale !== '' ? $locale : '';
+        } catch (\Throwable) {
+            return '';
+        }
+    }
+
+    /**
+     * Resolve product:* tags required by Facebook Shop / catalog ingesters
+     * (price, currency, availability). Returns an empty array when no
+     * current_product is in registry or the final price is non-positive.
      *
      * @return array<string, string>
      */
-    private function resolveProductPriceTags(): array
+    private function resolveProductTags(): array
     {
         $product = $this->registry->registry('current_product');
         if (!$product instanceof Product) {
             return [];
         }
+
+        $out = [];
 
         $finalPrice = $product->getFinalPrice();
         if ($finalPrice === null || $finalPrice === false) {
@@ -103,38 +123,73 @@ class OpenGraphResolver
             }
         }
         $finalPrice = (float) $finalPrice;
-        if ($finalPrice <= 0.0) {
-            return [];
+        if ($finalPrice > 0.0) {
+            try {
+                $currency = (string) $this->storeManager->getStore()->getCurrentCurrencyCode();
+            } catch (\Throwable) {
+                $currency = '';
+            }
+            if ($currency !== '') {
+                $out['product:price:amount']   = number_format($finalPrice, 2, '.', '');
+                $out['product:price:currency'] = $currency;
+            }
         }
 
-        try {
-            $currency = (string) $this->storeManager->getStore()->getCurrentCurrencyCode();
-        } catch (\Throwable) {
-            $currency = '';
+        // Availability — required by Facebook Shop, respected by most
+        // product catalog ingesters. Value set is drawn from OpenGraph
+        // product vocab: "instock" / "oos" / "pending" / "discontinued".
+        // We only distinguish in-stock vs out-of-stock; anything richer
+        // would require inventory plumbing beyond the scope of a meta
+        // tag module.
+        $isSalable = true;
+        if (method_exists($product, 'isSalable')) {
+            try {
+                $isSalable = (bool) $product->isSalable();
+            } catch (\Throwable) {
+                $isSalable = true;
+            }
         }
-        if ($currency === '') {
-            return [];
+        $out['product:availability'] = $isSalable ? 'instock' : 'oos';
+
+        // Brand / manufacturer — optional but strongly preferred by
+        // Facebook Shop feed. Read from the standard `manufacturer`
+        // attribute if the install has one set on this product.
+        if (method_exists($product, 'getAttributeText')) {
+            try {
+                $brand = (string) $product->getAttributeText('manufacturer');
+            } catch (\Throwable) {
+                $brand = '';
+            }
+            if ($brand !== '') {
+                $out['product:brand'] = $brand;
+            }
         }
 
-        return [
-            'product:price:amount'   => number_format($finalPrice, 2, '.', ''),
-            'product:price:currency' => $currency,
-        ];
+        return $out;
     }
 
     /**
      * Map entity type to OG type value.
+     *
+     * Category and CMS pages deliberately map to `website` rather than
+     * `article`: CMS pages on a Magento store are overwhelmingly
+     * informational (About, Contact, FAQ, Shipping Policy) — not blog
+     * articles. Merchants who want `article` semantics on a specific
+     * blog-style page can override via a custom theme/layout; the
+     * default stays safe for the typical store.
+     *
+     * Also: the pre-v1.1 code attempted ENTITY_CMS detection via a
+     * `cms_page` registry key that is only populated by the admin
+     * controller, never by the frontend flow — so the `article`
+     * branch was effectively dead code anyway. Simplifying to the
+     * two branches that actually fire in practice.
      *
      * @param string|null $entityType
      * @return string
      */
     private function resolveType(?string $entityType): string
     {
-        return match ($entityType) {
-            self::ENTITY_PRODUCT => 'product',
-            self::ENTITY_CMS => 'article',
-            default => 'website',
-        };
+        return $entityType === self::ENTITY_PRODUCT ? 'product' : 'website';
     }
 
     /**
@@ -168,18 +223,10 @@ class OpenGraphResolver
             return (string) $category->getName();
         }
 
-        $cmsPage = $this->registry->registry('cms_page');
-        if ($entityType === self::ENTITY_CMS && $cmsPage instanceof CmsPage) {
-            $own = (string) $cmsPage->getMetaTitle();
-            if ($own !== '') {
-                return $own;
-            }
-            return (string) $cmsPage->getTitle();
-        }
-
-        // Fallback for pages without a catalog/CMS entity (e.g. custom
-        // controllers): prefer the page title set on PageConfig so
-        // the og:title reflects the actual page rather than the store name.
+        // Fallback for CMS pages + custom controllers: prefer the page
+        // title set on PageConfig (populated by the CMS controller from
+        // the page's own meta_title / title) so og:title reflects the
+        // actual page rather than the store name.
         $pageTitle = $this->getPageConfigTitle();
         if ($pageTitle !== '') {
             return $pageTitle;
@@ -260,15 +307,9 @@ class OpenGraphResolver
             return $this->truncate((string) $category->getDescription(), 200);
         }
 
-        $cmsPage = $this->registry->registry('cms_page');
-        if ($cmsPage instanceof CmsPage) {
-            $own = (string) $cmsPage->getMetaDescription();
-            if ($own !== '') {
-                return $this->truncate($own, 200);
-            }
-            return '';
-        }
-
+        // CMS + custom-controller pages: use PageConfig description
+        // populated by the controller (pulled from the CMS page's
+        // meta_description field by the CMS controller).
         $pageDesc = $this->getPageConfigDescription();
         if ($pageDesc !== '') {
             return $this->truncate($pageDesc, 200);
@@ -458,21 +499,6 @@ class OpenGraphResolver
                 }
             }
 
-            if ($entityType === self::ENTITY_CMS) {
-                $cmsPage = $this->registry->registry('cms_page');
-                if ($cmsPage instanceof CmsPage) {
-                    try {
-                        $store = $this->storeManager->getStore();
-                        $base = rtrim((string) $store->getBaseUrl(), '/');
-                        $identifier = ltrim((string) $cmsPage->getIdentifier(), '/');
-                        if ($identifier !== '') {
-                            return $base . '/' . $identifier;
-                        }
-                    } catch (\Throwable) {
-                        // fall through to current URL
-                    }
-                }
-            }
         } catch (\Throwable) {
             // fall through to current URL
         }
@@ -505,13 +531,26 @@ class OpenGraphResolver
     }
 
     /**
-     * Resolve store name from configuration.
+     * Resolve site name for og:site_name.
+     *
+     * Prefers `general/store_information/name` (the merchant-facing brand
+     * name) over `$store->getName()` which returns the internal store
+     * view label like "Default Store View" — not something a merchant
+     * wants their shoppers to see in a Facebook preview card.
      *
      * @return string
      */
-    private function resolveSiteName(): string
+    private function resolveSiteName(int $storeId = 0): string
     {
         try {
+            $brand = (string) $this->scopeConfig->getValue(
+                'general/store_information/name',
+                ScopeInterface::SCOPE_STORE,
+                $storeId > 0 ? $storeId : null
+            );
+            if ($brand !== '') {
+                return $brand;
+            }
             return (string) $this->storeManager->getStore()->getName();
         } catch (\Throwable) {
             return '';
@@ -542,6 +581,14 @@ class OpenGraphResolver
     /**
      * Detect the current entity type and ID from the registry.
      *
+     * Only product + category are reliably registered on the frontend —
+     * the `cms_page` registry key is exclusive to the admin Edit
+     * controller, never populated on storefront requests, so the old
+     * ENTITY_CMS detection path was dead code. CMS pages fall through
+     * to the default type/URL/title path which uses PageConfig (set by
+     * the CMS controller) and the current URL — correct enough for
+     * og:* purposes without the false ENTITY_CMS branching.
+     *
      * @return array{0: ?string, 1: int}
      */
     private function detectEntity(): array
@@ -556,16 +603,15 @@ class OpenGraphResolver
             return [self::ENTITY_CATEGORY, (int) $category->getId()];
         }
 
-        $cmsPage = $this->registry->registry('cms_page');
-        if ($cmsPage !== null && $cmsPage->getId()) {
-            return [self::ENTITY_CMS, (int) $cmsPage->getId()];
-        }
-
         return [null, 0];
     }
 
     /**
      * Truncate a string to max length, stripping HTML tags first.
+     *
+     * Uses the single-character ellipsis `…` rather than three dots so
+     * the output is tighter in token terms and matches what Google's
+     * snippet generator + Facebook's preview renderer produce natively.
      *
      * @param string $text
      * @param int $maxLength
@@ -581,6 +627,6 @@ class OpenGraphResolver
             return $text;
         }
 
-        return mb_substr($text, 0, $maxLength - 3) . '...';
+        return rtrim(mb_substr($text, 0, $maxLength - 1)) . '…';
     }
 }
