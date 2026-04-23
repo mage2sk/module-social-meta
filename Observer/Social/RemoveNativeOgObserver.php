@@ -3,11 +3,9 @@ declare(strict_types=1);
 
 namespace Panth\SocialMeta\Observer\Social;
 
-use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\Event\Observer;
 use Magento\Framework\Event\ObserverInterface;
 use Magento\Framework\View\LayoutInterface;
-use Magento\Store\Model\ScopeInterface;
 use Psr\Log\LoggerInterface;
 
 /**
@@ -19,8 +17,6 @@ use Psr\Log\LoggerInterface;
  */
 class RemoveNativeOgObserver implements ObserverInterface
 {
-    private const XML_OG_ENABLED = 'panth_social_meta/social/og_enabled';
-
     /**
      * Well-known native OG block names that Magento core and Hyva may add
      * via layout XML. Each name is checked with {@see LayoutInterface::getBlock()}
@@ -58,28 +54,38 @@ class RemoveNativeOgObserver implements ObserverInterface
      */
     private const OWN_BLOCK_PREFIX = 'panth_social_meta.';
 
-    /**
-     * @param ScopeConfigInterface $scopeConfig
-     * @param LoggerInterface $logger
-     */
     public function __construct(
-        private readonly ScopeConfigInterface $scopeConfig,
         private readonly LoggerInterface $logger
     ) {
     }
 
     /**
-     * Remove native OpenGraph blocks when OG output is enabled.
+     * Remove Magento / Hyva native OpenGraph layout blocks.
+     *
+     * Runs unconditionally once the module is installed — no longer
+     * gated on `panth_social_meta/social/og_enabled`. Rationale:
+     *
+     *   - With the previous gating, disabling our OG left Magento
+     *     core's product/view/opengraph/general.phtml free to emit 5
+     *     og:* tags. A merchant who flips "Enable Open Graph Tags" →
+     *     No reasonably expects ZERO og:* output on the storefront,
+     *     not a silent fallback to Magento's native template. This
+     *     matches the natural semantics of the admin toggle.
+     *
+     *   - If a merchant installed this module at all, they opted into
+     *     its OpenGraph pipeline. Disabling temporarily = no OG at
+     *     all. Uninstalling the module restores native behaviour
+     *     automatically via Magento's module dependency graph.
+     *
+     *   - The removal is cheap (a handful of getBlock() lookups) and
+     *     runs once per layout generation, then the result gets
+     *     cached by FPC.
      *
      * @param Observer $observer
      * @return void
      */
     public function execute(Observer $observer): void
     {
-        if (!$this->isOgEnabled()) {
-            return;
-        }
-
         /** @var LayoutInterface $layout */
         $layout = $observer->getEvent()->getLayout();
         if (!$layout instanceof LayoutInterface) {
@@ -143,16 +149,4 @@ class RemoveNativeOgObserver implements ObserverInterface
         }
     }
 
-    /**
-     * Check whether OG tag emission is enabled for the current scope.
-     *
-     * @return bool
-     */
-    private function isOgEnabled(): bool
-    {
-        return $this->scopeConfig->isSetFlag(
-            self::XML_OG_ENABLED,
-            ScopeInterface::SCOPE_STORE
-        );
-    }
 }

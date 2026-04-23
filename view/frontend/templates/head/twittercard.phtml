@@ -6,8 +6,10 @@
  * Panth Social Meta — Twitter Card tag renderer.
  *
  * Same escape strategy as the OpenGraph template: URL-valued names go
- * through escapeUrl() to avoid `:` and `/` being turned into HTML
- * entities, and text-valued names use escapeHtmlAttr().
+ * through escapeUrl() to keep `:` / `/` intact; text-valued names use
+ * escapeHtml() (htmlspecialchars ENT_QUOTES | ENT_HTML5) rather than
+ * escapeHtmlAttr() so printable ASCII like `@` in twitter:site handles
+ * stays readable in view-source.
  */
 
 if (!$block->isEnabled()) {
@@ -32,7 +34,7 @@ foreach ($tags as $name => $content) {
     }
     $escapedContent = isset($urlNames[$name])
         ? $escaper->escapeUrl($content)
-        : $escaper->escapeHtmlAttr($content);
+        : $escaper->escapeHtml($content);
 
     echo '<meta name="' . $escaper->escapeHtml($name) . '" content="' . $escapedContent . '" />' . "\n";
 }

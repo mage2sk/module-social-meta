@@ -5,11 +5,18 @@
 /**
  * Panth Social Meta — OpenGraph tag renderer.
  *
- * URL-valued properties (og:url, og:image, secure variants) are escaped
- * with escapeUrl() which preserves `:` and `/` so scrapers see a clean
- * URL. Text-valued properties (title, description, site_name, type,
- * locale) use escapeHtmlAttr() which is HTML-attribute-safe without
- * over-escaping characters that are valid inside a quoted attribute.
+ * URL-valued properties (og:url, og:image, secure variants) go through
+ * escapeUrl() which preserves `:` and `/` so scrapers see a clean URL.
+ *
+ * Text-valued properties (title, description, site_name, type, locale)
+ * use escapeHtml() rather than escapeHtmlAttr() — Magento's
+ * escapeHtmlAttr() runs Zend\Escaper which aggressively encodes every
+ * non-ASCII-safe byte (e.g. `@` → `&#x40;`, which makes twitter:site
+ * handles look wrong in view-source even though social scrapers decode
+ * entities). escapeHtml() uses htmlspecialchars() with ENT_QUOTES |
+ * ENT_HTML5, which properly escapes the five characters that matter
+ * inside a double-quoted attribute (`<`, `>`, `&`, `"`, `'`) without
+ * touching printable ASCII.
  */
 
 if (!$block->isEnabled()) {
@@ -37,7 +44,7 @@ foreach ($tags as $property => $content) {
     }
     $escapedContent = isset($urlProperties[$property])
         ? $escaper->escapeUrl($content)
-        : $escaper->escapeHtmlAttr($content);
+        : $escaper->escapeHtml($content);
 
     echo '<meta property="' . $escaper->escapeHtml($property) . '" content="' . $escapedContent . '" />' . "\n";
 }
