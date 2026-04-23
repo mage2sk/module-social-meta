@@ -90,7 +90,7 @@ Product pages additionally emit `product:price:amount`, `product:price:currency`
 | **Description fallback chain** | Product: `meta_description` → `short_description`. Category: `meta_description` → `description`. CMS / other: `PageConfig->getDescription()` → `design/head/default_description`. Every description is truncated at 200 characters using a single-character ellipsis `…` (not three dots) so Facebook's preview card renders cleanly. |
 | **Image fallback chain** | Product image → category image → first in-stock product image in that category → admin-configured Default OG Image (`panth_social_meta/social/default_og_image`, stored under `media/panth_seo/og/`) → store logo (`design/header/logo_src`) → Magento's product placeholder. Never blank unless the store has no logo and no placeholder either. |
 | **URL canonicalisation** | `og:url` uses the entity's own URL model (`$product->getProductUrl(false)` / `$category->getUrl()`), query string stripped. CMS / other pages use `$store->getCurrentUrl(false)` with `?` and `#` trimmed. Rendered through `escapeUrl()` so `:` and `/` stay intact in view-source. |
-| **`og:site_name` prefers brand over store label** | Reads `general/store_information/name` first, falling back to `$store->getName()`. So a merchant with "Agritrend UK" in Store Information ships that as the site name even if the Magento store view label is still the factory default "Default Store View". |
+| **`og:site_name` prefers brand over store label** | Reads `general/store_information/name` first, falling back to `$store->getName()`. So a merchant with "Acme Store" in Store Information ships that as the site name even if the Magento store view label is still the factory default "Default Store View". |
 | **`og:locale` per store view** | Reads `general/locale/code` at store scope and emits it verbatim (`en_US`, `en_GB`, `fr_FR`, …). Multi-store installs get correct per-region `og:locale` with no admin work. |
 | **Product stock state** | `product:availability` is derived from `$product->isSalable()` — `instock` when salable, `oos` when not. Flipping stock status in the admin immediately changes the emitted tag on the next uncached render, so Facebook Shop and catalog ingesters see accurate stock state. |
 | **Product brand** | `product:brand` reads the `manufacturer` attribute's dropdown label via `getAttributeText('manufacturer')`. Optional — only emitted when the attribute is set. |
@@ -148,23 +148,23 @@ bin/magento module:status Panth_SocialMeta
 # Module is enabled
 
 # Any product page should emit exactly one og:* block + one twitter:* block
-curl -ks https://hyva.test/tiber-t-shirt.html | grep -oE '<meta (property|name)="(og|twitter|product):[^"]+"[^>]*>'
+curl -ks https://hyva.test/example-product.html | grep -oE '<meta (property|name)="(og|twitter|product):[^"]+"[^>]*>'
 # <meta property="og:type" content="product" />
-# <meta property="og:title" content="Tiber T-Shirt" />
+# <meta property="og:title" content="Example Product" />
 # <meta property="og:description" content="Soft combed cotton, straight hem, made for everyday wear." />
-# <meta property="og:image" content="https://hyva.test/media/catalog/product/t/i/tiber-t-shirt.jpg" />
-# <meta property="og:url" content="https://hyva.test/tiber-t-shirt.html" />
-# <meta property="og:site_name" content="Agritrend UK" />
+# <meta property="og:image" content="https://hyva.test/media/catalog/product/t/i/example-product.jpg" />
+# <meta property="og:url" content="https://hyva.test/example-product.html" />
+# <meta property="og:site_name" content="Acme Store" />
 # <meta property="og:locale" content="en_US" />
 # <meta property="product:price:amount" content="29.00" />
 # <meta property="product:price:currency" content="USD" />
 # <meta property="product:availability" content="instock" />
-# <meta property="product:brand" content="Tiber Clothing" />
+# <meta property="product:brand" content="Example Brand" />
 # <meta name="twitter:card" content="summary_large_image" />
-# <meta name="twitter:title" content="Tiber T-Shirt" />
+# <meta name="twitter:title" content="Example Product" />
 # <meta name="twitter:description" content="Soft combed cotton, straight hem, made for everyday wear." />
-# <meta name="twitter:image" content="https://hyva.test/media/catalog/product/t/i/tiber-t-shirt.jpg" />
-# <meta name="twitter:site" content="@agritrend" />
+# <meta name="twitter:image" content="https://hyva.test/media/catalog/product/t/i/example-product.jpg" />
+# <meta name="twitter:site" content="@yourstore" />
 
 # Category page — same flow minus the product:* block
 curl -ks https://hyva.test/men/tops-men.html | grep -oE '<meta property="og:[^"]+"[^>]*>'
@@ -173,15 +173,15 @@ curl -ks https://hyva.test/men/tops-men.html | grep -oE '<meta property="og:[^"]
 # <meta property="og:description" content="Everyday tees, long-sleeve, fleece and performance fabrics." />
 # <meta property="og:image" content="https://hyva.test/media/catalog/category/men-tops-hero.jpg" />
 # <meta property="og:url" content="https://hyva.test/men/tops-men.html" />
-# <meta property="og:site_name" content="Agritrend UK" />
+# <meta property="og:site_name" content="Acme Store" />
 # <meta property="og:locale" content="en_US" />
 
 # Luma store view — identical output from a different domain
-curl -ks https://luma.test/tiber-t-shirt.html | grep -oE '<meta property="og:url"[^>]+>'
-# <meta property="og:url" content="https://luma.test/tiber-t-shirt.html" />
+curl -ks https://luma.test/example-product.html | grep -oE '<meta property="og:url"[^>]+>'
+# <meta property="og:url" content="https://luma.test/example-product.html" />
 
 # Confirm no duplicates — this count should always be 1 per property per page
-curl -ks https://hyva.test/tiber-t-shirt.html | grep -c '<meta property="og:title"'
+curl -ks https://hyva.test/example-product.html | grep -c '<meta property="og:title"'
 # 1
 ```
 
@@ -240,21 +240,21 @@ bin/magento cache:flush config full_page
 
 ```html
 <meta property="og:type" content="product" />
-<meta property="og:title" content="Compete Track Tote" />
+<meta property="og:title" content="Example Bag" />
 <meta property="og:description" content="Lightweight tote for gym and track — waterproof lining, expandable side pocket." />
 <meta property="og:image" content="https://hyva.test/media/catalog/product/w/b/wb04-black-0.jpg" />
-<meta property="og:url" content="https://hyva.test/compete-track-tote.html" />
-<meta property="og:site_name" content="Agritrend UK" />
+<meta property="og:url" content="https://hyva.test/example-bag.html" />
+<meta property="og:site_name" content="Acme Store" />
 <meta property="og:locale" content="en_US" />
 <meta property="product:price:amount" content="32.75" />
 <meta property="product:price:currency" content="USD" />
 <meta property="product:availability" content="instock" />
-<meta property="product:brand" content="Compete Sports" />
+<meta property="product:brand" content="Example Brand" />
 <meta name="twitter:card" content="summary_large_image" />
-<meta name="twitter:title" content="Compete Track Tote" />
+<meta name="twitter:title" content="Example Bag" />
 <meta name="twitter:description" content="Lightweight tote for gym and track — waterproof lining, expandable side pocket." />
 <meta name="twitter:image" content="https://hyva.test/media/catalog/product/w/b/wb04-black-0.jpg" />
-<meta name="twitter:site" content="@agritrend" />
+<meta name="twitter:site" content="@yourstore" />
 ```
 
 ### Category page
@@ -265,7 +265,7 @@ bin/magento cache:flush config full_page
 <meta property="og:description" content="Every seasonal men's top in one place — tees, hoodies, performance fabrics." />
 <meta property="og:image" content="https://hyva.test/media/catalog/category/men-tops.jpg" />
 <meta property="og:url" content="https://hyva.test/men/tops-men.html" />
-<meta property="og:site_name" content="Agritrend UK" />
+<meta property="og:site_name" content="Acme Store" />
 <meta property="og:locale" content="en_US" />
 ```
 
@@ -274,18 +274,18 @@ bin/magento cache:flush config full_page
 ```html
 <meta property="og:type" content="website" />
 <meta property="og:title" content="About Us" />
-<meta property="og:description" content="Independent UK running retailer shipping across Europe from our Bristol warehouse." />
+<meta property="og:description" content="Who we are, where we ship from and how to reach us." />
 <meta property="og:image" content="https://hyva.test/media/panth_seo/og/default-og-1200x630.jpg" />
 <meta property="og:url" content="https://hyva.test/about-us" />
-<meta property="og:site_name" content="Agritrend UK" />
+<meta property="og:site_name" content="Acme Store" />
 <meta property="og:locale" content="en_US" />
 ```
 
 ### Luma store view — identical resolver output, different host
 
 ```html
-<meta property="og:url" content="https://luma.test/compete-track-tote.html" />
-<meta property="og:site_name" content="Agritrend UK Outlet" />
+<meta property="og:url" content="https://luma.test/example-bag.html" />
+<meta property="og:site_name" content="Acme Store Outlet" />
 <meta property="og:locale" content="en_GB" />
 ```
 
@@ -296,9 +296,9 @@ Because the resolver is driven entirely by store-scope config (`general/locale/c
 When both master switches are off, the page ships zero social meta — not a fallback to Magento core's native OG template:
 
 ```bash
-curl -ks https://hyva.test/tiber-t-shirt.html | grep -c '<meta property="og:'
+curl -ks https://hyva.test/example-product.html | grep -c '<meta property="og:'
 # 0
-curl -ks https://hyva.test/tiber-t-shirt.html | grep -c '<meta name="twitter:'
+curl -ks https://hyva.test/example-product.html | grep -c '<meta name="twitter:'
 # 0
 ```
 
@@ -339,7 +339,7 @@ console.log('Duplicates:', dupes.length ? dupes : 'none ✓');
 A minimal curl-based test you can wire into deploy:
 
 ```bash
-for url in / /tiber-t-shirt.html /men/tops-men.html /about-us; do
+for url in / /example-product.html /men/tops-men.html /about-us; do
   og=$(curl -ks "https://hyva.test${url}" | grep -c '<meta property="og:')
   tw=$(curl -ks "https://hyva.test${url}" | grep -c '<meta name="twitter:')
   dup=$(curl -ks "https://hyva.test${url}" | grep -c '<meta property="og:title"')
@@ -358,7 +358,7 @@ Run on both Hyva and Luma hosts after every deploy that touches social meta, the
 # With og_enabled=No, Magento core's product/view/opengraph/general.phtml would normally ship 5 native og:* tags on a PDP
 bin/magento config:set panth_social_meta/social/og_enabled 0
 bin/magento cache:flush config full_page
-curl -ks https://hyva.test/tiber-t-shirt.html | grep -c '<meta property="og:'
+curl -ks https://hyva.test/example-product.html | grep -c '<meta property="og:'
 # 0  ← observer stripped the native blocks; no silent fallback
 bin/magento config:set panth_social_meta/social/og_enabled 1
 bin/magento cache:flush config full_page
@@ -383,7 +383,7 @@ Three things to check, in order:
 A third-party SEO / Hyva module is re-adding an OG block under a name that doesn't match the observer's patterns. Check with:
 
 ```bash
-curl -ks https://hyva.test/tiber-t-shirt.html | grep -oE '<meta property="og:title"[^>]*>' | sort -u
+curl -ks https://hyva.test/example-product.html | grep -oE '<meta property="og:title"[^>]*>' | sort -u
 # Should show exactly one line
 ```
 
@@ -403,7 +403,7 @@ require __DIR__ . "/app/bootstrap.php";
 $bs = \Magento\Framework\App\Bootstrap::create(BP, []);
 $om = $bs->getObjectManager();
 $om->get(\Magento\Framework\App\State::class)->setAreaCode("frontend");
-$p = $om->create(\Magento\Catalog\Model\ProductRepository::class)->get("tiber-t-shirt");
+$p = $om->create(\Magento\Catalog\Model\ProductRepository::class)->get("example-product");
 var_dump($p->isSalable());
 '
 ```
