@@ -17,6 +17,10 @@
 [![Website](https://img.shields.io/badge/Website-kishansavaliya.com-0D9488)](https://kishansavaliya.com)
 [![Get a Quote](https://img.shields.io/badge/Get%20a%20Quote-Free%20Estimate-DC2626)](https://kishansavaliya.com/get-quote)
 
+<p align="center">
+  <img src="docs/images/hero-banner.png" alt="Panth Social Meta — free Open Graph and Twitter Card extension for Magento 2, built by Kishan Savaliya (Panth Infotech), Top Rated Plus on Upwork." width="100%" />
+</p>
+
 > **Out of the box Magento emits five og:* tags on product pages and zero on categories or CMS pages — and on Hyva the core `product/view/opengraph/general.phtml` template happily duplicates whatever a theme, a third-party SEO module, or a manual layout snippet has already added.** The visible result is a Facebook preview that picks the wrong image, a Twitter card that omits the `@handle`, and view-source output with entity-encoded `&#x40;` where you wrote `@yourstore`. **Panth Social Meta** fixes the stack end-to-end: one resolver computes `og:*` and `twitter:*` from the current entity (product / category / CMS) with progressive image / title / description fallbacks, an observer on `layout_generate_blocks_after` strips Magento and Hyva's native OG blocks so duplicates can never render, and the templates use `escapeUrl()` for URL-valued attributes and `escapeHtml()` (ENT_QUOTES | ENT_HTML5) — not Zend Escaper — for text-valued ones so `@yourstore` stays readable while still being XSS-safe. Five store-scoped admin fields cover the entire configuration surface. Zero JS, zero theme overrides, identical output on Hyva and Luma.
 
 Product pages additionally emit `product:price:amount`, `product:price:currency`, `product:availability` (derived from `$product->isSalable()` → `instock` | `oos`) and `product:brand` (from the `manufacturer` attribute) so Facebook Shop and every major product-feed ingester pick up pricing and stock state without a separate feed plugin. `og:locale` tracks each store's `general/locale/code`, so a UK store view ships `en_GB` while the US store view ships `en_US` from the same codebase.
