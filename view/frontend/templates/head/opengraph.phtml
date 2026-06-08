@@ -3,13 +3,13 @@
 /** @var \Magento\Framework\Escaper $escaper */
 
 /**
- * Panth Social Meta — OpenGraph tag renderer.
+ * Panth Social Meta - OpenGraph tag renderer.
  *
  * URL-valued properties (og:url, og:image, secure variants) go through
  * escapeUrl() which preserves `:` and `/` so scrapers see a clean URL.
  *
  * Text-valued properties (title, description, site_name, type, locale)
- * use escapeHtml() rather than escapeHtmlAttr() — Magento's
+ * use escapeHtml() rather than escapeHtmlAttr() - Magento's
  * escapeHtmlAttr() runs Zend\Escaper which aggressively encodes every
  * non-ASCII-safe byte (e.g. `@` → `&#x40;`, which makes twitter:site
  * handles look wrong in view-source even though social scrapers decode
