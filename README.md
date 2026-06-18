@@ -1,33 +1,53 @@
 <!-- SEO Meta -->
 <!--
-  Title: Panth Social Meta — Open Graph + Twitter Card Tags for Magento 2 (Hyva + Luma)
-  Description: Clean, single-emission Open Graph and Twitter Card meta tags for Magento 2. Five store-scoped admin toggles (OG enable, Twitter enable, Twitter card type, Twitter site handle, default OG image), automatic removal of Magento/Hyva native og:* blocks so no duplicates ever ship, escape-safe rendering that keeps `@` handles and URLs readable in view-source, product:availability / product:brand / og:locale output, Facebook-Shop-compatible price tags on PDP, and theme-agnostic head rendering — identical output on Hyva and Luma with zero template overrides.
-  Keywords: magento 2 open graph, magento 2 twitter card, magento og tags, magento social meta, magento facebook preview, magento twitter preview, hyva open graph, luma open graph, magento og:image, magento product availability meta, panth social meta
+  Title: Magento 2 Open Graph and Twitter Card Extension | Social Meta Tags | Hyva + Luma | Panth Infotech
+  Description: Panth Social Meta adds correct Open Graph and Twitter Card meta tags to every Magento 2 product, category, and CMS page. Removes duplicate native og:* blocks, supports per-store Twitter handles, fallback image chain, product price and availability tags, og:locale per store view. Works on Hyva and Luma with zero theme overrides. Built by Top Rated Plus Magento developer Kishan Savaliya.
+  Keywords: magento 2 open graph, magento 2 twitter card, magento og tags, magento social meta, magento facebook preview, magento twitter preview, hyva open graph, luma open graph, magento og:image, magento product availability meta, magento 2 social meta extension, panth social meta
   Author: Kishan Savaliya (Panth Infotech)
+  Canonical: https://kishansavaliya.com/magento-2-social-meta.html
 -->
 
-# Panth Social Meta — Open Graph + Twitter Card Tags for Magento 2 (Hyva + Luma)
+# Magento 2 Open Graph and Twitter Card Extension: Social Meta Tags for Hyva and Luma
 
 [![Magento 2.4.4 - 2.4.8](https://img.shields.io/badge/Magento-2.4.4%20--%202.4.8-orange?logo=magento&logoColor=white)](https://magento.com)
 [![PHP 8.1 - 8.4](https://img.shields.io/badge/PHP-8.1%20--%208.4-blue?logo=php&logoColor=white)](https://php.net)
-[![Hyva Compatible](https://img.shields.io/badge/Hyva-Compatible-14b8a6?logo=alpinedotjs&logoColor=white)](https://hyva.io)
-[![Luma Compatible](https://img.shields.io/badge/Luma-Compatible-orange)]()
+[![Hyva + Luma](https://img.shields.io/badge/Themes-Hyva%20%2B%20Luma-14b8a6)](https://www.hyva.io)
+[![Live Demo & Details](https://img.shields.io/badge/Live%20Demo%20%26%20Details-magento--2--social--meta-0D9488?style=flat)](https://kishansavaliya.com/magento-2-social-meta.html)
 [![Packagist](https://img.shields.io/badge/Packagist-mage2kishan%2Fmodule--social--meta-orange?logo=packagist&logoColor=white)](https://packagist.org/packages/mage2kishan/module-social-meta)
 [![Upwork Top Rated Plus](https://img.shields.io/badge/Upwork-Top%20Rated%20Plus-14a800?logo=upwork&logoColor=white)](https://www.upwork.com/freelancers/~016dd1767321100e21)
 [![Website](https://img.shields.io/badge/Website-kishansavaliya.com-0D9488)](https://kishansavaliya.com)
-[![Get a Quote](https://img.shields.io/badge/Get%20a%20Quote-Free%20Estimate-DC2626)](https://kishansavaliya.com/get-quote)
+
+> **Add correct Open Graph and Twitter Card meta tags to every product, category, and CMS page in your Magento 2 store.** Panth Social Meta handles title, description, image, URL, locale, product price, stock status, and brand tags in one install. It also removes Magento's native og:* blocks so duplicates never reach the page. Identical output on **Hyva** and **Luma**, zero theme overrides needed.
+
+**Product page:** [kishansavaliya.com/magento-2-social-meta.html](https://kishansavaliya.com/magento-2-social-meta.html)
 
 <p align="center">
-  <img src="docs/images/hero-banner.png" alt="Panth Social Meta — free Open Graph and Twitter Card extension for Magento 2, built by Kishan Savaliya (Panth Infotech), Top Rated Plus on Upwork." width="100%" />
+  <img src="docs/images/hero-banner.png" alt="Panth Social Meta -- Open Graph and Twitter Card extension for Magento 2, built by Kishan Savaliya (Panth Infotech), Top Rated Plus on Upwork." width="100%" />
 </p>
 
-> **Out of the box Magento emits five og:* tags on product pages and zero on categories or CMS pages — and on Hyva the core `product/view/opengraph/general.phtml` template happily duplicates whatever a theme, a third-party SEO module, or a manual layout snippet has already added.** The visible result is a Facebook preview that picks the wrong image, a Twitter card that omits the `@handle`, and view-source output with entity-encoded `&#x40;` where you wrote `@yourstore`. **Panth Social Meta** fixes the stack end-to-end: one resolver computes `og:*` and `twitter:*` from the current entity (product / category / CMS) with progressive image / title / description fallbacks, an observer on `layout_generate_blocks_after` strips Magento and Hyva's native OG blocks so duplicates can never render, and the templates use `escapeUrl()` for URL-valued attributes and `escapeHtml()` (ENT_QUOTES | ENT_HTML5) — not Zend Escaper — for text-valued ones so `@yourstore` stays readable while still being XSS-safe. Five store-scoped admin fields cover the entire configuration surface. Zero JS, zero theme overrides, identical output on Hyva and Luma.
+---
 
-Product pages additionally emit `product:price:amount`, `product:price:currency`, `product:availability` (derived from `$product->isSalable()` → `instock` | `oos`) and `product:brand` (from the `manufacturer` attribute) so Facebook Shop and every major product-feed ingester pick up pricing and stock state without a separate feed plugin. `og:locale` tracks each store's `general/locale/code`, so a UK store view ships `en_GB` while the US store view ships `en_US` from the same codebase.
+## Quick Answer
+
+**What is Panth Social Meta?** It is a Magento 2 extension that outputs correct Open Graph and Twitter Card meta tags on every storefront page so that Facebook, Twitter/X, LinkedIn, and other platforms show the right image, title, and description when someone shares a link.
+
+**What does it add to my store?**
+
+- **Open Graph tags** (og:title, og:description, og:image, og:url, og:site_name, og:locale, og:type) on product, category, and CMS pages.
+- **Twitter Card tags** (twitter:card, twitter:title, twitter:description, twitter:image, twitter:site) for Twitter/X previews.
+- **Product-specific tags** (product:price:amount, product:price:currency, product:availability, product:brand) on product pages, so Facebook Shop and feed ingesters pick up price and stock state.
+- **Duplicate removal** so Magento's native og:* blocks are stripped and only one set of tags lands on the page.
+- **Per-entity OG attributes** (og_title, og_description, og_image) installed on every product and category attribute set, so you can override per product or category.
+
+**Which themes are supported?** Both **Hyva** (Alpine.js) and **Luma**, with identical output and no theme overrides required.
+
+**What does it need?** Magento 2.4.4 to 2.4.8, PHP 8.1 to 8.4, and the free `mage2kishan/module-core` package.
 
 ---
 
 ## Need Custom Magento 2 Development?
+
+> **Get a free quote for your project in 24 hours** for custom modules, Hyva themes, performance work, M1 to M2 migrations, and Adobe Commerce Cloud.
 
 <p align="center">
   <a href="https://kishansavaliya.com/get-quote">
@@ -44,170 +64,164 @@ Product pages additionally emit `product:price:amount`, `product:price:currency`
 
 [![Hire on Upwork](https://img.shields.io/badge/Hire%20on%20Upwork-Top%20Rated%20Plus-14a800?style=for-the-badge&logo=upwork&logoColor=white)](https://www.upwork.com/freelancers/~016dd1767321100e21)
 
+100% Job Success - 10+ Years Magento Experience
+Adobe Certified - Hyva Specialist
+
 </td>
 <td width="50%" align="center">
 
 ### Panth Infotech Agency
+**Magento Development Team**
 
 [![Visit Agency](https://img.shields.io/badge/Visit%20Agency-Panth%20Infotech-14a800?style=for-the-badge&logo=upwork&logoColor=white)](https://www.upwork.com/agencies/1881421506131960778/)
+
+Custom Modules - Theme Design - Migrations
+Performance - SEO - Adobe Commerce Cloud
 
 </td>
 </tr>
 </table>
 
+**Visit our website:** [kishansavaliya.com](https://kishansavaliya.com) &nbsp;|&nbsp; **Get a quote:** [kishansavaliya.com/get-quote](https://kishansavaliya.com/get-quote)
+
 ---
 
 ## Table of Contents
 
-- [Preview](#preview)
-- [Features](#features)
-- [How It Works](#how-it-works)
+- [Who Is It For](#who-is-it-for)
+- [Key Features](#key-features)
 - [Compatibility](#compatibility)
 - [Installation](#installation)
-- [Verify](#verify)
 - [Configuration](#configuration)
-- [Storefront Rendering](#storefront-rendering)
+- [How It Works](#how-it-works)
+- [Storefront Output](#storefront-output)
 - [Testing Your Social Tags](#testing-your-social-tags)
 - [Troubleshooting](#troubleshooting)
+- [FAQ](#faq)
 - [Support](#support)
+- [About Panth Infotech](#about-panth-infotech)
+- [Quick Links](#quick-links)
 
 ---
 
-## Preview
+## Who Is It For
 
-### Admin
-
-**System configuration** — **Stores → Configuration → Panth Extensions → Social Meta**. Five store-scoped fields: Enable Open Graph Tags, Enable Twitter Card Tags, Twitter Card Type (`summary` | `summary_large_image`), Twitter Site Handle (`@yourstore`), and Default OG Image (uploaded under `media/panth_seo/og/`). Every field is `[store view]`-scoped so a multi-store install can ship a different handle, card type and fallback image per storefront.
-
-![Admin configuration](docs/images/admin-config.png)
-
----
-
-## Features
-
-| Feature | Description |
-|---|---|
-| **Single-emission OG + Twitter** | `Observer\Social\RemoveNativeOgObserver` runs on `layout_generate_blocks_after` and unsets every native OG block it can find — the four well-known names (`opengraph.general`, `opengraph.product`, `opengraph.category`, `opengraph.cms`) plus anything matching `opengraph` (substring) or `og.` (prefix). The module's own blocks (prefixed `panth_social_meta.`) are explicitly skipped. Net result: exactly one `og:title`, one `og:image`, one `og:url` per page — never a duplicate pair from a theme + module collision. |
-| **Disable = silence** | When `og_enabled = No`, the observer still runs so Magento core's `product/view/opengraph/general.phtml` (which ships 5 `og:*` tags on every PDP) does not silently leak through. Flipping the toggle off means zero `og:*` on the storefront, which is what the admin label actually implies. |
-| **Entity-aware resolver** | `Model\Social\OpenGraphResolver::resolve()` detects the current entity via `current_product` / `current_category` in the Magento registry. Products get `og:type=product` plus `product:price:*`, `product:availability`, `product:brand`. Categories and CMS pages get `og:type=website`. Title / description / image / URL each have their own progressive fallback chain so the tags never blank out. |
-| **Title fallback chain** | Product: `meta_title` → `name`. Category: `meta_title` → `name`. CMS / other: `PageConfig->getTitle()` (set by the CMS controller from the page's own meta_title) → store name. |
-| **Description fallback chain** | Product: `meta_description` → `short_description`. Category: `meta_description` → `description`. CMS / other: `PageConfig->getDescription()` → `design/head/default_description`. Every description is truncated at 200 characters using a single-character ellipsis `…` (not three dots) so Facebook's preview card renders cleanly. |
-| **Image fallback chain** | Product image → category image → first in-stock product image in that category → admin-configured Default OG Image (`panth_social_meta/social/default_og_image`, stored under `media/panth_seo/og/`) → store logo (`design/header/logo_src`) → Magento's product placeholder. Never blank unless the store has no logo and no placeholder either. |
-| **URL canonicalisation** | `og:url` uses the entity's own URL model (`$product->getProductUrl(false)` / `$category->getUrl()`), query string stripped. CMS / other pages use `$store->getCurrentUrl(false)` with `?` and `#` trimmed. Rendered through `escapeUrl()` so `:` and `/` stay intact in view-source. |
-| **`og:site_name` prefers brand over store label** | Reads `general/store_information/name` first, falling back to `$store->getName()`. So a merchant with "Acme Store" in Store Information ships that as the site name even if the Magento store view label is still the factory default "Default Store View". |
-| **`og:locale` per store view** | Reads `general/locale/code` at store scope and emits it verbatim (`en_US`, `en_GB`, `fr_FR`, …). Multi-store installs get correct per-region `og:locale` with no admin work. |
-| **Product stock state** | `product:availability` is derived from `$product->isSalable()` — `instock` when salable, `oos` when not. Flipping stock status in the admin immediately changes the emitted tag on the next uncached render, so Facebook Shop and catalog ingesters see accurate stock state. |
-| **Product brand** | `product:brand` reads the `manufacturer` attribute's dropdown label via `getAttributeText('manufacturer')`. Optional — only emitted when the attribute is set. |
-| **Product price tags** | `product:price:amount` and `product:price:currency` on PDP when the final price is positive. Price is formatted with exactly two decimals and a period separator, matching the OpenGraph product vocab. |
-| **Twitter Card wraps OG** | `TwitterCardResolver` reuses the OG output — `twitter:title`, `twitter:description`, `twitter:image` all mirror their `og:*` counterparts, `twitter:card` is the admin-configured type, and `twitter:site` carries the configured handle (emitted only when non-empty). Turn OG off and Twitter auto-switches off; turn OG on and Twitter on independently. |
-| **Escape-safe rendering** | URL-valued attributes (`og:url`, `og:image`, `og:image:secure_url`, `og:video`, `og:audio`, `twitter:image`, `twitter:image:src`, `twitter:player`) go through `escapeUrl()` which preserves `:` and `/`. Text-valued attributes go through `escapeHtml()` which uses `htmlspecialchars()` with `ENT_QUOTES | ENT_HTML5` — escapes the five characters that matter inside a double-quoted attribute (`<`, `>`, `&`, `"`, `'`) without mangling `@`, `&`-free ampersand-like text, or other printable ASCII. This is why `@yourstore` lands as `content="@yourstore"` in view-source instead of the over-escaped `content="&#x40;yourstore"` you get with Magento's default `escapeHtmlAttr()` (which runs Zend\Escaper). |
-| **EAV OG attributes on product + category** | `Setup\Patch\Data\AddOgAttributes` installs `og_title`, `og_description`, `og_image` on every product and category attribute set, under the "Search Engine Optimization" fieldset. Populate them per-entity when you want to override what the meta_title / meta_description fallback would emit. |
-| **Theme-agnostic head rendering** | `view/frontend/layout/default.xml` attaches both head blocks to `head.additional`. Templates are plain PHP `<meta>` output — no Alpine directives, no RequireJS, no `x-magento-init`. Identical output on Hyva, Luma, Breeze, custom themes. |
-| **Fully cacheable** | Both head blocks declare `cacheable="true"`. Output ends up in full-page cache alongside the rest of `<head>` and costs nothing per-request after the first uncached render. The observer fires only during layout generation, not on cached hits. |
+- **Stores running paid social ads** on Facebook or Instagram where the preview image, title, and price need to match the product exactly.
+- **Content-heavy stores** with many category and CMS pages, where out-of-the-box Magento leaves those pages with no og:* tags at all.
+- **Multi-store setups** that need a different Twitter handle, card type, and fallback image per storefront, all controlled from the standard admin config.
+- **Hyva storefronts** where Magento's own Open Graph template and a theme OG block can collide and emit duplicate tags on every product page.
+- **Merchants using Facebook Shop or product catalog feeds** who need product:price, product:availability, and product:brand tags on every product detail page.
 
 ---
 
-## How It Works
+## Key Features
 
-Four cooperating pieces, one request:
+### Open Graph Tags on Every Page Type
 
-1. **`Observer\Social\RemoveNativeOgObserver`** runs on `layout_generate_blocks_after` in the frontend area. Before any block is rendered it walks the layout tree twice — once by well-known block names (`opengraph.general`, `opengraph.product`, `opengraph.category`, `opengraph.cms`), once by pattern (`opengraph` substring, `og.` prefix) — and `unsetElement()`s each match. This module's own blocks start with `panth_social_meta.` and are skipped by name, so only native Magento / Hyva / third-party OG blocks disappear. The observer runs unconditionally: when a merchant disables the module's OG output they expect zero `og:*` on the storefront, not Magento core's 5-tag native template filling the vacuum.
-2. **`Model\Social\OpenGraphResolver::resolve()`** is the read path. It detects the current entity from the Magento registry, walks the title / description / image / URL fallback chains, pulls `og:site_name` from `general/store_information/name`, pulls `og:locale` from `general/locale/code`, and — when the entity is a product — adds `product:price:amount`, `product:price:currency`, `product:availability` (from `isSalable()`) and `product:brand` (from the `manufacturer` attribute). Returns a flat `['og:property' => 'value']` array with empty values filtered out.
-3. **`Model\Social\TwitterCardResolver::resolve()`** wraps the OG result. `twitter:title` / `twitter:description` / `twitter:image` mirror the OG equivalents so the two preview cards always agree. `twitter:card` is the admin-configured type, `twitter:site` is the configured handle (omitted when empty). Returns an empty array if the OG resolver returns empty — so disabling OG silently disables Twitter too.
-4. **The two phtml templates** (`view/frontend/templates/head/opengraph.phtml` + `.../twittercard.phtml`) iterate the resolved array and emit one `<meta>` tag per entry. URL-valued attribute names (hardcoded allowlist) go through `$escaper->escapeUrl()`, everything else goes through `$escaper->escapeHtml()`. The property / name value itself is always escaped with `escapeHtml()` because the allowlist is fixed to ASCII. When the resolver returns empty (module disabled, no entity, etc.) the template early-returns and writes nothing.
+- **Product pages** get og:type=product, og:title, og:description, og:image, og:url, og:site_name, og:locale, and the full product:* block.
+- **Category pages** get og:type=website plus title, description, image, URL, site_name, and locale from the category entity.
+- **CMS pages** (About Us, Contact, policies, etc.) get og:type=website with title and description from the CMS page meta fields.
+- **Progressive fallback chains** for title, description, image, and URL so the tags never go blank even if meta fields are empty.
 
-The EAV patch (`Setup\Patch\Data\AddOgAttributes`) is a one-shot install that runs during `setup:upgrade` — it adds `og_title`, `og_description`, `og_image` to every product and category attribute set, under the "Search Engine Optimization" group. The attributes are read by the resolver via the standard `getData()` path when set.
+### Twitter Card Tags
+
+- **twitter:card** set to `summary_large_image` or `summary` from the admin, per store view.
+- **twitter:title**, **twitter:description**, **twitter:image** mirror the resolved OG values so both previews always agree.
+- **twitter:site** carries your store's handle (`@yourstore`) and is omitted entirely when left blank.
+- **Independent toggle**: you can ship OG only, Twitter only, both, or neither.
+
+### Product Price, Stock, and Brand Tags
+
+- **product:price:amount** and **product:price:currency** on every product page when the final price is positive.
+- **product:availability** derived from `$product->isSalable()` so Facebook Shop sees accurate instock/oos state on every uncached render.
+- **product:brand** read from the `manufacturer` attribute label and omitted when not set.
+
+### Duplicate Tag Removal
+
+- **Observer removes native og:* blocks** on `layout_generate_blocks_after`, stripping Magento core's `opengraph.general`, `opengraph.product`, `opengraph.category`, and `opengraph.cms` blocks, plus anything matching `opengraph` substring or `og.` prefix.
+- **Disable = zero tags**: when you turn off the OG toggle, the observer still runs so Magento's native 5-tag template does not silently fill in.
+- **This module's own blocks** (prefixed `panth_social_meta.`) are explicitly skipped, so only one set of tags lands on the page.
+
+### Per-Store and Per-Entity Control
+
+- **All five admin fields are store view scoped**, so a multi-store install can ship different handle, card type, and fallback image per storefront.
+- **EAV attributes** (og_title, og_description, og_image) installed on every product and category attribute set under "Search Engine Optimization", so you can override the resolved value per product or category.
+- **og:locale** reads `general/locale/code` at store scope and emits it verbatim (en_US, en_GB, fr_FR, etc.).
+
+### Escape-Safe Rendering
+
+- **URL-valued attributes** (og:url, og:image, twitter:image, etc.) go through `escapeUrl()` so colons and slashes stay intact in view-source.
+- **Text-valued attributes** go through `escapeHtml()` with ENT_QUOTES so `@yourstore` lands as `content="@yourstore"` and not `content="&#x40;yourstore"`.
+
+### Hyva and Luma Ready
+
+- **Head blocks attach to `head.additional`** via layout XML, with no Alpine directives, no RequireJS, and no Knockout. Output is plain `<meta>` PHP.
+- **Identical output** on Hyva, Luma, Breeze, and custom themes with no template overrides needed.
+- **Both blocks declare `cacheable="true"`** so the output lands in full-page cache alongside the rest of `<head>`.
 
 ---
 
 ## Compatibility
 
-| Requirement | Supported |
+| Requirement | Versions Supported |
 |---|---|
 | Magento Open Source | 2.4.4, 2.4.5, 2.4.6, 2.4.7, 2.4.8 |
-| Adobe Commerce | 2.4.4 — 2.4.8 |
-| PHP | 8.1, 8.2, 8.3, 8.4 |
-| Hyva Theme | 1.0+ (fully compatible — no theme overrides) |
+| Adobe Commerce | 2.4.4, 2.4.5, 2.4.6, 2.4.7, 2.4.8 |
+| Adobe Commerce Cloud | 2.4.4 to 2.4.8 |
+| PHP | 8.1.x, 8.2.x, 8.3.x, 8.4.x |
+| Hyva Theme | 1.0+ (no theme overrides required) |
 | Luma Theme | Native support |
-| Panth Core | ^1.0 (installed automatically) |
+| Required Dependency | `mage2kishan/module-core` (free) |
 
 ---
 
 ## Installation
+
+### Composer Installation (Recommended)
 
 ```bash
 composer require mage2kishan/module-social-meta
 bin/magento module:enable Panth_Core Panth_SocialMeta
 bin/magento setup:upgrade
 bin/magento setup:di:compile
+bin/magento setup:static-content:deploy -f
 bin/magento cache:flush
 ```
 
----
+### Manual Installation via ZIP
 
-## Verify
+1. Download the latest release from [Packagist](https://packagist.org/packages/mage2kishan/module-social-meta) or from the [product page](https://kishansavaliya.com/magento-2-social-meta.html).
+2. Extract it to `app/code/Panth/SocialMeta/` in your Magento install.
+3. Make sure `Panth_Core` is installed too (required dependency).
+4. Run the commands above starting from `bin/magento module:enable`.
+
+### Verify Installation
 
 ```bash
 bin/magento module:status Panth_SocialMeta
-# Module is enabled
-
-# Any product page should emit exactly one og:* block + one twitter:* block
-curl -ks https://hyva.test/example-product.html | grep -oE '<meta (property|name)="(og|twitter|product):[^"]+"[^>]*>'
-# <meta property="og:type" content="product" />
-# <meta property="og:title" content="Example Product" />
-# <meta property="og:description" content="Soft combed cotton, straight hem, made for everyday wear." />
-# <meta property="og:image" content="https://hyva.test/media/catalog/product/t/i/example-product.jpg" />
-# <meta property="og:url" content="https://hyva.test/example-product.html" />
-# <meta property="og:site_name" content="Acme Store" />
-# <meta property="og:locale" content="en_US" />
-# <meta property="product:price:amount" content="29.00" />
-# <meta property="product:price:currency" content="USD" />
-# <meta property="product:availability" content="instock" />
-# <meta property="product:brand" content="Example Brand" />
-# <meta name="twitter:card" content="summary_large_image" />
-# <meta name="twitter:title" content="Example Product" />
-# <meta name="twitter:description" content="Soft combed cotton, straight hem, made for everyday wear." />
-# <meta name="twitter:image" content="https://hyva.test/media/catalog/product/t/i/example-product.jpg" />
-# <meta name="twitter:site" content="@yourstore" />
-
-# Category page — same flow minus the product:* block
-curl -ks https://hyva.test/men/tops-men.html | grep -oE '<meta property="og:[^"]+"[^>]*>'
-# <meta property="og:type" content="website" />
-# <meta property="og:title" content="Men's Tops" />
-# <meta property="og:description" content="Everyday tees, long-sleeve, fleece and performance fabrics." />
-# <meta property="og:image" content="https://hyva.test/media/catalog/category/men-tops-hero.jpg" />
-# <meta property="og:url" content="https://hyva.test/men/tops-men.html" />
-# <meta property="og:site_name" content="Acme Store" />
-# <meta property="og:locale" content="en_US" />
-
-# Luma store view — identical output from a different domain
-curl -ks https://luma.test/example-product.html | grep -oE '<meta property="og:url"[^>]+>'
-# <meta property="og:url" content="https://luma.test/example-product.html" />
-
-# Confirm no duplicates — this count should always be 1 per property per page
-curl -ks https://hyva.test/example-product.html | grep -c '<meta property="og:title"'
-# 1
+# Expected: Module is enabled
 ```
 
-Visit **Stores → Configuration → Panth Extensions → Social Meta** to see the admin panel.
+After install, open:
+```
+Admin -> Stores -> Configuration -> Panth Extensions -> Social Meta
+```
 
 ---
 
 ## Configuration
 
-Navigate to **Stores → Configuration → Panth Extensions → Social Meta**.
+Go to **Stores -> Configuration -> Panth Extensions -> Social Meta**.
 
-| Setting | Path | Default | What it controls |
+| Setting | Group | Default | Description |
 |---|---|---|---|
-| **Enable Open Graph Tags** | `panth_social_meta/social/og_enabled` | Yes | Master switch for `og:*`. When No the resolver returns empty, the OpenGraph template writes nothing, **and** the observer still strips Magento's native OG blocks — so the page ships with zero `og:*` instead of falling back to core's 5-tag native template. |
-| **Enable Twitter Card Tags** | `panth_social_meta/social/twitter_enabled` | Yes | Master switch for `twitter:*`. Independent of OG — you can ship OG only (disable Twitter), Twitter only (disable OG), both, or neither. |
-| **Twitter Card Type** | `panth_social_meta/social/twitter_card_type` | `summary_large_image` | `summary_large_image` shows a large featured image in Twitter/X preview cards; `summary` shows a smaller square thumbnail. Source model: `Panth\SocialMeta\Model\Config\Source\TwitterCardType`. |
-| **Twitter Site Handle** | `panth_social_meta/social/twitter_site_handle` | *(empty)* | The `@yourstore` handle emitted as `twitter:site`. When empty, the tag is omitted entirely — not emitted as an empty attribute. Plain-text — the template escapes via `escapeHtml()` so the `@` sign stays readable in view-source. |
-| **Default OG Image** | `panth_social_meta/social/default_og_image` | *(empty)* | Image uploaded under `media/panth_seo/og/`. Used as the penultimate fallback in the image chain — after product image, category image and first-product-in-category, before the store logo and Magento placeholder. Recommended size: 1200 × 630 (Facebook / Twitter `summary_large_image` aspect ratio). |
+| Enable Open Graph Tags | Social / Open Graph | Yes | Master toggle for all og:* tags. When set to No, the observer still strips Magento's native OG blocks so the page ships with zero og:* output. |
+| Enable Twitter Card Tags | Social / Open Graph | Yes | Master toggle for all twitter:* tags. Independent of the OG toggle. |
+| Twitter Card Type | Social / Open Graph | summary_large_image | `summary_large_image` shows a large featured image in Twitter/X previews. `summary` shows a smaller square thumbnail. |
+| Twitter Site Handle | Social / Open Graph | (empty) | Your store's @handle emitted as `twitter:site`. Omitted when left blank. Per store view so each storefront can have its own handle. |
+| Default OG Image | Social / Open Graph | (empty) | Fallback image uploaded under `media/panth_seo/og/`. Used when the product, category, or CMS page has no image of its own. Recommended size: 1200x630 px. |
 
-Every field is `[store view]`-scoped. Ship a different `twitter_site_handle`, card type and Default OG Image per storefront to match each brand's social presence.
-
-After saving, flush the `config` and `full_page` caches — the observer output is baked into FPC so a cached page keeps whichever configuration was active when it was cached:
+Every field is store view scoped. After saving, flush the config and full_page caches:
 
 ```bash
 bin/magento cache:flush config full_page
@@ -215,39 +229,26 @@ bin/magento cache:flush config full_page
 
 ---
 
-## Storefront Rendering
+## How It Works
 
-`view/frontend/layout/default.xml` attaches both head blocks to `head.additional`:
+1. **Observer removes native OG blocks.** On `layout_generate_blocks_after`, `Observer\Social\RemoveNativeOgObserver` walks the layout tree and removes Magento's native og:* blocks by well-known name and by pattern. This runs even when the module is disabled, so no native fallback leaks through.
+2. **Resolver reads the current entity.** `Model\Social\OpenGraphResolver::resolve()` checks the Magento registry for `current_product` or `current_category`. For a product it outputs og:type=product and the full product:* block. For a category or CMS page it outputs og:type=website. Each of title, description, image, and URL has its own fallback chain so the tags never go blank.
+3. **Twitter Card resolver wraps OG output.** `Model\Social\TwitterCardResolver::resolve()` reuses the resolved OG values for twitter:title, twitter:description, and twitter:image. It adds the admin-configured card type and handle. When OG is disabled, Twitter returns empty too.
+4. **Templates write the meta tags.** `view/frontend/templates/head/opengraph.phtml` and `twittercard.phtml` iterate the resolved array and emit one `<meta>` tag per entry. URL-valued attribute names go through `escapeUrl()`, everything else through `escapeHtml()`. When the resolver returns empty the template writes nothing.
+5. **Setup patch installs EAV attributes.** `Setup\Patch\Data\AddOgAttributes` runs once during `setup:upgrade` and adds og_title, og_description, og_image to every product and category attribute set under the "Search Engine Optimization" group.
 
-```xml
-<referenceBlock name="head.additional">
-  <block class="Panth\SocialMeta\Block\Head\OpenGraph"
-         name="panth_social_meta.opengraph"
-         template="Panth_SocialMeta::head/opengraph.phtml"
-         cacheable="true">
-    <arguments>
-      <argument name="view_model" xsi:type="object">Panth\SocialMeta\ViewModel\OpenGraph</argument>
-    </arguments>
-  </block>
-  <block class="Panth\SocialMeta\Block\Head\TwitterCard"
-         name="panth_social_meta.twittercard"
-         template="Panth_SocialMeta::head/twittercard.phtml"
-         cacheable="true">
-    <arguments>
-      <argument name="view_model" xsi:type="object">Panth\SocialMeta\ViewModel\TwitterCard</argument>
-    </arguments>
-  </block>
-</referenceBlock>
-```
+---
 
-### Product page (PDP)
+## Storefront Output
+
+### Product Page
 
 ```html
 <meta property="og:type" content="product" />
 <meta property="og:title" content="Example Bag" />
-<meta property="og:description" content="Lightweight tote for gym and track — waterproof lining, expandable side pocket." />
-<meta property="og:image" content="https://hyva.test/media/catalog/product/w/b/wb04-black-0.jpg" />
-<meta property="og:url" content="https://hyva.test/example-bag.html" />
+<meta property="og:description" content="Lightweight tote for gym and track." />
+<meta property="og:image" content="https://example.com/media/catalog/product/w/b/wb04-black-0.jpg" />
+<meta property="og:url" content="https://example.com/example-bag.html" />
 <meta property="og:site_name" content="Acme Store" />
 <meta property="og:locale" content="en_US" />
 <meta property="product:price:amount" content="32.75" />
@@ -256,179 +257,186 @@ bin/magento cache:flush config full_page
 <meta property="product:brand" content="Example Brand" />
 <meta name="twitter:card" content="summary_large_image" />
 <meta name="twitter:title" content="Example Bag" />
-<meta name="twitter:description" content="Lightweight tote for gym and track — waterproof lining, expandable side pocket." />
-<meta name="twitter:image" content="https://hyva.test/media/catalog/product/w/b/wb04-black-0.jpg" />
+<meta name="twitter:description" content="Lightweight tote for gym and track." />
+<meta name="twitter:image" content="https://example.com/media/catalog/product/w/b/wb04-black-0.jpg" />
 <meta name="twitter:site" content="@yourstore" />
 ```
 
-### Category page
+### Category Page
 
 ```html
 <meta property="og:type" content="website" />
 <meta property="og:title" content="Men's Tops" />
-<meta property="og:description" content="Every seasonal men's top in one place — tees, hoodies, performance fabrics." />
-<meta property="og:image" content="https://hyva.test/media/catalog/category/men-tops.jpg" />
-<meta property="og:url" content="https://hyva.test/men/tops-men.html" />
+<meta property="og:description" content="Every seasonal men's top in one place." />
+<meta property="og:image" content="https://example.com/media/catalog/category/men-tops.jpg" />
+<meta property="og:url" content="https://example.com/men/tops-men.html" />
 <meta property="og:site_name" content="Acme Store" />
 <meta property="og:locale" content="en_US" />
 ```
 
-### CMS page (About Us, Contact, Shipping Policy, …)
+### Admin Configuration
 
-```html
-<meta property="og:type" content="website" />
-<meta property="og:title" content="About Us" />
-<meta property="og:description" content="Who we are, where we ship from and how to reach us." />
-<meta property="og:image" content="https://hyva.test/media/panth_seo/og/default-og-1200x630.jpg" />
-<meta property="og:url" content="https://hyva.test/about-us" />
-<meta property="og:site_name" content="Acme Store" />
-<meta property="og:locale" content="en_US" />
-```
+**Stores -> Configuration -> Panth Extensions -> Social Meta**. Five store-scoped fields: Enable Open Graph Tags, Enable Twitter Card Tags, Twitter Card Type, Twitter Site Handle, and Default OG Image.
 
-### Luma store view — identical resolver output, different host
-
-```html
-<meta property="og:url" content="https://luma.test/example-bag.html" />
-<meta property="og:site_name" content="Acme Store Outlet" />
-<meta property="og:locale" content="en_GB" />
-```
-
-Because the resolver is driven entirely by store-scope config (`general/locale/code`, `general/store_information/name`, `panth_social_meta/social/*`) and the registry-detected entity, two store views on the same install produce correct-per-store output without any per-store layout XML. The EAV fallback (`og_title` / `og_description` / `og_image`) is also store-scoped via the standard ScopedAttributeInterface.
-
-### What **disable** looks like
-
-When both master switches are off, the page ships zero social meta — not a fallback to Magento core's native OG template:
-
-```bash
-curl -ks https://hyva.test/example-product.html | grep -c '<meta property="og:'
-# 0
-curl -ks https://hyva.test/example-product.html | grep -c '<meta name="twitter:'
-# 0
-```
+![Admin configuration](docs/images/admin-config.png)
 
 ---
 
 ## Testing Your Social Tags
 
-A working setup requires the tags to be (a) present, (b) unique (one per property per page), (c) rendered with readable values (URLs not entity-encoded, `@` handles not over-escaped) and (d) preview-correct in the scraper tools. Validate all four.
+After install, validate the output with the official preview tools:
 
-### Official preview validators
+- **[Facebook Sharing Debugger](https://developers.facebook.com/tools/debug/)** - scrapes the URL and shows the exact og:* values Facebook ingested. Use "Scrape Again" after config changes.
+- **[Twitter/X Card Validator](https://developer.x.com/)** - renders the exact card the Twitter/X timeline will show.
+- **[LinkedIn Post Inspector](https://www.linkedin.com/post-inspector/)** - inspects OG tags for LinkedIn previews.
+- **[opengraph.xyz](https://www.opengraph.xyz/)** - multi-platform preview in one URL paste.
 
-The authoritative tools — paste any URL from the storefront:
-
-- **[Facebook Sharing Debugger](https://developers.facebook.com/tools/debug/)** — scrapes the URL, shows the exact `og:*` values Facebook ingested, and lets you "Scrape Again" to force a cache refresh after deploying changes.
-- **[Twitter/X Card Validator](https://cards-dev.twitter.com/validator)** (now rolled into [X's developer portal](https://developer.x.com/)) — renders the exact card the Twitter/X timeline will show, surfaces missing / broken tags.
-- **[LinkedIn Post Inspector](https://www.linkedin.com/post-inspector/)** — inspects OG tags for LinkedIn previews, with a "Force re-scrape" control.
-- **[opengraph.xyz](https://www.opengraph.xyz/)** — multi-platform preview (Facebook, Twitter/X, LinkedIn, WhatsApp, Slack, Discord, iMessage) from a single URL paste.
-
-### In-browser spot check
-
-Open any storefront URL and run in DevTools console:
+Check for duplicate tags in the browser DevTools console:
 
 ```js
-// Enumerate every social meta tag on the page
-[...document.querySelectorAll('meta[property^="og:"], meta[property^="product:"], meta[name^="twitter:"]')]
-  .map(m => `${m.getAttribute('property') || m.getAttribute('name')} → ${m.content}`)
-
-// Duplicate detection — any count > 1 is a bug
 const names = [...document.querySelectorAll('meta[property], meta[name]')]
   .map(m => m.getAttribute('property') || m.getAttribute('name'))
   .filter(n => n.startsWith('og:') || n.startsWith('twitter:') || n.startsWith('product:'));
 const dupes = names.filter((n, i) => names.indexOf(n) !== i);
-console.log('Duplicates:', dupes.length ? dupes : 'none ✓');
+console.log('Duplicates:', dupes.length ? dupes : 'none');
 ```
-
-### CI smoke test
-
-A minimal curl-based test you can wire into deploy:
-
-```bash
-for url in / /example-product.html /men/tops-men.html /about-us; do
-  og=$(curl -ks "https://hyva.test${url}" | grep -c '<meta property="og:')
-  tw=$(curl -ks "https://hyva.test${url}" | grep -c '<meta name="twitter:')
-  dup=$(curl -ks "https://hyva.test${url}" | grep -c '<meta property="og:title"')
-  if [ "$og" -lt 5 ] || [ "$dup" -ne 1 ]; then
-    echo "FAIL  ${url}  og=${og}  og:title×${dup}  twitter=${tw}"; exit 1
-  fi
-  echo "OK    ${url}  og=${og}  twitter=${tw}"
-done
-```
-
-Run on both Hyva and Luma hosts after every deploy that touches social meta, theme layout, or the RemoveNativeOgObserver.
-
-### Confirm the observer is stripping native blocks
-
-```bash
-# With og_enabled=No, Magento core's product/view/opengraph/general.phtml would normally ship 5 native og:* tags on a PDP
-bin/magento config:set panth_social_meta/social/og_enabled 0
-bin/magento cache:flush config full_page
-curl -ks https://hyva.test/example-product.html | grep -c '<meta property="og:'
-# 0  ← observer stripped the native blocks; no silent fallback
-bin/magento config:set panth_social_meta/social/og_enabled 1
-bin/magento cache:flush config full_page
-```
-
-If this returns anything other than `0` when disabled, either a third-party module is re-adding an OG block under a name that doesn't match the `opengraph` / `og.` patterns, or FPC is still serving a cache entry from before the flush. Hard-flush with `bin/magento cache:clean` and re-test.
 
 ---
 
 ## Troubleshooting
 
-### No `og:*` or `twitter:*` tags on the storefront
+### No og:* or twitter:* tags on the storefront
 
-Three things to check, in order:
+Check these three things in order:
 
-1. **Master switches** — *Stores → Configuration → Panth Extensions → Social Meta → Enable Open Graph Tags / Enable Twitter Card Tags = Yes* at the current store scope. When No, the resolver returns empty and the template writes nothing. Flush `config` + `full_page` caches after flipping.
-2. **FPC cache** — the page was cached before the config change. Run `bin/magento cache:flush config full_page` and re-test. The resolver is only invoked on uncached renders.
-3. **Theme overriding `head.additional`** — a custom theme's layout XML can null out the `head.additional` container. Search your theme package for `<referenceBlock name="head.additional" remove="true"/>` and remove it. The same layout XML is what hosts Magento's native OG tags, so removing it breaks those too.
+1. **Master switches** - Stores -> Configuration -> Panth Extensions -> Social Meta -> Enable Open Graph Tags = Yes at the current store scope. Flush `config` + `full_page` caches after changing.
+2. **FPC cache** - the page was cached before the config change. Run `bin/magento cache:flush config full_page` and reload.
+3. **Theme overriding head.additional** - a custom theme's layout XML can remove the `head.additional` container. Search your theme for `<referenceBlock name="head.additional" remove="true"/>` and remove it.
 
-### `og:title` or `og:image` rendering twice
+### og:title renders twice
 
-A third-party SEO / Hyva module is re-adding an OG block under a name that doesn't match the observer's patterns. Check with:
-
-```bash
-curl -ks https://hyva.test/example-product.html | grep -oE '<meta property="og:title"[^>]*>' | sort -u
-# Should show exactly one line
-```
-
-If two different lines appear, identify the offending module (`bin/magento module:status` + `grep -r "og:title" vendor/<vendor>/`) and either (a) open an issue with the offending module to adopt a predictable block name (`opengraph.*` or `og.*`), or (b) add its block name to `Observer\Social\RemoveNativeOgObserver::NATIVE_OG_BLOCKS` and PR upstream.
-
-### `twitter:site` shows `&#x40;yourstore` instead of `@yourstore`
-
-Your theme is shipping an override of `view/frontend/templates/head/twittercard.phtml` that uses `$escaper->escapeHtmlAttr()` instead of `$escaper->escapeHtml()`. Magento's `escapeHtmlAttr()` runs Zend\Escaper which aggressively encodes every non-ASCII-safe byte, so the `@` sign becomes `&#x40;`. Social scrapers decode entities so the handle still **works**, but it looks wrong in view-source and some linters flag it. Fix: remove the theme override, or mirror the module's escape strategy (`escapeUrl()` for URL-valued names, `escapeHtml()` for everything else).
-
-### `product:availability` always `instock` even for out-of-stock products
-
-The resolver reads `$product->isSalable()`. If this returns true for an out-of-stock product, you have a stock configuration issue, not a social meta one — check *Stores → Configuration → Catalog → Inventory → Stock Options → Display Out of Stock Products* and the product's own stock status. Confirm by loading the product in a bin/magento script:
+A third-party module is re-adding an OG block under a name that doesn't match the observer's patterns. Check with:
 
 ```bash
-php -r '
-require __DIR__ . "/app/bootstrap.php";
-$bs = \Magento\Framework\App\Bootstrap::create(BP, []);
-$om = $bs->getObjectManager();
-$om->get(\Magento\Framework\App\State::class)->setAreaCode("frontend");
-$p = $om->create(\Magento\Catalog\Model\ProductRepository::class)->get("example-product");
-var_dump($p->isSalable());
-'
+curl -ks https://example.com/example-product.html | grep -oE '<meta property="og:title"[^>]*>' | sort -u
 ```
 
-If this prints `true` but the frontend shows Out of Stock, the resolver is reporting `isSalable()` correctly and the storefront display is driven by stock inventory — bring the two in line via the product's Stock Status.
+If two lines appear, identify the module and either extend the observer's block name list or open an issue with the offending module.
 
-### `og:site_name` = "Default Store View"
+### twitter:site shows &#x40;yourstore instead of @yourstore
 
-Nothing has been set in *Stores → Configuration → General → Store Information → Store Name*. The resolver prefers that value (the merchant-facing brand name) and only falls back to the Magento store view label when it's empty. Set the Store Name per store view and re-flush caches.
+Your theme has an override of `twittercard.phtml` that uses `$escaper->escapeHtmlAttr()`. Remove the override or change it to use `$escaper->escapeHtml()` for text-valued attributes.
 
-### `og:image` returning an absolute URL for the placeholder even though a Default OG Image is uploaded
+### og:site_name shows "Default Store View"
 
-The uploaded file must live under `media/panth_seo/og/` — the backend model `Magento\Config\Model\Config\Backend\Image` stores it there automatically when uploaded via the admin form. If you moved the file by hand, move it back or re-upload via the admin. The resolver also rejects values containing `..`, backslashes, leading `/`, or null bytes as a path-traversal guard.
+Set a Store Name in Stores -> Configuration -> General -> Store Information -> Store Name. The resolver uses that value and only falls back to the Magento store view label when it is empty.
 
-### Tests pass but Facebook's preview still shows the old image
+---
 
-Facebook aggressively caches OG data. Open the [Sharing Debugger](https://developers.facebook.com/tools/debug/), paste the URL, and click **Scrape Again**. Twitter/X and LinkedIn have equivalent controls. The resolver does not cache OG data itself — the stale preview is server-side on the scraper, not the store.
+## FAQ
+
+### Does this work on Hyva themes?
+Yes. Both head blocks attach to `head.additional` via plain layout XML. There are no Alpine directives, no RequireJS modules, and no Knockout bindings, so the output is identical on Hyva and Luma. No template overrides are needed in your theme.
+
+### Will it conflict with other SEO extensions?
+The observer removes blocks by known name and pattern, not by module. If another SEO extension adds an OG block with an `opengraph` or `og.` prefix it will be removed. If the other extension uses a different naming convention you may see duplicates. Use the DevTools duplicate check above to confirm.
+
+### Can I set different tags per product?
+Yes. The setup patch installs og_title, og_description, and og_image attributes on every product and category attribute set. Fill them in per product when you want to override what the meta_title or meta_description fallback would produce.
+
+### Does it support multi-store?
+Yes. All five configuration fields are store view scoped. Each store view can have its own Twitter handle, card type, fallback image, and OG/Twitter toggles. og:locale also reads the store-scoped locale code so each store view emits the correct language tag.
+
+### Does the product availability tag update in real time?
+It updates on the next uncached render after a stock change. The tag reads `$product->isSalable()`, so flipping the stock status in the admin changes the emitted value. Flush the `full_page` cache after the change to force a fresh render.
+
+### Does it need Panth Core?
+Yes. `mage2kishan/module-core` is a free, required dependency that Composer installs for you automatically.
+
+### What image size should I upload as the Default OG Image?
+1200 x 630 pixels. This is the aspect ratio Facebook and Twitter use for `summary_large_image` cards. A smaller image still works but may appear letterboxed.
+
+### Can I disable Twitter Cards and keep Open Graph?
+Yes. The Enable Twitter Card Tags toggle is independent of the Enable Open Graph Tags toggle. You can ship OG only, Twitter only, both, or neither.
+
+### What happens when I set Enable Open Graph Tags to No?
+The resolver returns an empty array and the template writes nothing. The observer still runs and removes Magento's native og:* blocks, so the page ships with zero og:* output rather than falling back to Magento's 5-tag native template.
 
 ---
 
 ## Support
 
-- **Agency:** [Panth Infotech on Upwork](https://www.upwork.com/agencies/1881421506131960778/)
-- **Direct:** [kishansavaliya.com](https://kishansavaliya.com) — [Get a free quote](https://kishansavaliya.com/get-quote)
+| Channel | Contact |
+|---|---|
+| Product Page | [kishansavaliya.com/magento-2-social-meta.html](https://kishansavaliya.com/magento-2-social-meta.html) |
+| Email | kishansavaliyakb@gmail.com |
+| Website | [kishansavaliya.com](https://kishansavaliya.com) |
+| WhatsApp | +91 84012 70422 |
+| GitHub Issues | [github.com/mage2sk/module-social-meta/issues](https://github.com/mage2sk/module-social-meta/issues) |
+| Upwork (Top Rated Plus) | [Hire Kishan Savaliya](https://www.upwork.com/freelancers/~016dd1767321100e21) |
+| Upwork Agency | [Panth Infotech](https://www.upwork.com/agencies/1881421506131960778/) |
+
+Response time: 1-2 business days.
+
+### Need Custom Magento Development?
+
+Looking for **custom Magento module development**, **Hyva theme work**, **store migrations**, or **performance tuning**? Get a free quote in 24 hours:
+
+<p align="center">
+  <a href="https://kishansavaliya.com/get-quote">
+    <img src="https://img.shields.io/badge/%F0%9F%92%AC%20Get%20a%20Free%20Quote-kishansavaliya.com%2Fget--quote-DC2626?style=for-the-badge" alt="Get a Free Quote" />
+  </a>
+</p>
+
+<p align="center">
+  <a href="https://www.upwork.com/freelancers/~016dd1767321100e21">
+    <img src="https://img.shields.io/badge/Hire%20Kishan-Top%20Rated%20Plus-14a800?style=for-the-badge&logo=upwork&logoColor=white" alt="Hire on Upwork" />
+  </a>
+  &nbsp;&nbsp;
+  <a href="https://www.upwork.com/agencies/1881421506131960778/">
+    <img src="https://img.shields.io/badge/Visit-Panth%20Infotech%20Agency-14a800?style=for-the-badge&logo=upwork&logoColor=white" alt="Visit Agency" />
+  </a>
+  &nbsp;&nbsp;
+  <a href="https://kishansavaliya.com/magento-2-social-meta.html">
+    <img src="https://img.shields.io/badge/View%20Product%20Page-magento--2--social--meta-0D9488?style=for-the-badge" alt="View Product Page" />
+  </a>
+</p>
+
+---
+
+## About Panth Infotech
+
+Built and maintained by **Kishan Savaliya** ([kishansavaliya.com](https://kishansavaliya.com)), a **Top Rated Plus** Magento developer on Upwork with 10+ years of eCommerce experience.
+
+**Panth Infotech** is a Magento 2 development agency that builds high quality, security focused extensions and themes for both Hyva and Luma storefronts. The extension suite covers SEO, performance, checkout, product presentation, customer engagement, and store management, with each module built to MEQP standards and tested across Magento 2.4.4 to 2.4.8.
+
+Browse the full extension catalog on our [Magento extensions page](https://kishansavaliya.com/magento-extensions.html) or on [Packagist](https://packagist.org/packages/mage2kishan/).
+
+---
+
+## Quick Links
+
+| Resource | Link |
+|---|---|
+| **Product Page** | [magento-2-social-meta.html](https://kishansavaliya.com/magento-2-social-meta.html) |
+| **Packagist** | [mage2kishan/module-social-meta](https://packagist.org/packages/mage2kishan/module-social-meta) |
+| **GitHub** | [mage2sk/module-social-meta](https://github.com/mage2sk/module-social-meta) |
+| **Website** | [kishansavaliya.com](https://kishansavaliya.com) |
+| **Free Quote** | [kishansavaliya.com/get-quote](https://kishansavaliya.com/get-quote) |
+| **Upwork (Top Rated Plus)** | [Hire Kishan Savaliya](https://www.upwork.com/freelancers/~016dd1767321100e21) |
+| **Upwork Agency** | [Panth Infotech](https://www.upwork.com/agencies/1881421506131960778/) |
+| **Email** | kishansavaliyakb@gmail.com |
+| **WhatsApp** | +91 84012 70422 |
+
+---
+
+<p align="center">
+  <strong>Ready to get proper social previews on every product, category, and CMS page?</strong><br/>
+  <a href="https://kishansavaliya.com/magento-2-social-meta.html">
+    <img src="https://img.shields.io/badge/%F0%9F%9A%80%20See%20Social%20Meta%20%E2%86%92-Product%20Page%20%26%20Details-DC2626?style=for-the-badge" alt="See Social Meta" />
+  </a>
+</p>
+
+---
+
+**SEO Keywords:** magento 2 open graph, magento 2 open graph extension, magento 2 twitter card, magento 2 twitter card extension, magento 2 social meta, magento 2 social meta tags, magento og tags, magento facebook preview, magento twitter preview, magento 2 og:image, magento 2 product availability meta, magento 2 og:locale, magento 2 social sharing, hyva open graph, hyva twitter card, luma open graph, magento 2 facebook shop tags, magento 2 product:price meta, magento 2 product:availability meta, magento 2 duplicate og tags fix, magento 2 social meta extension, magento 2.4.8 open graph, php 8.4 magento open graph, mage2kishan social meta, panth social meta, panth infotech, hire magento developer, top rated plus upwork, kishan savaliya magento, custom magento development
