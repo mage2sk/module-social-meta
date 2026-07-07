@@ -11,35 +11,16 @@ use Magento\Eav\Setup\EavSetupFactory;
 use Magento\Framework\Setup\ModuleDataSetupInterface;
 use Magento\Framework\Setup\Patch\DataPatchInterface;
 
-/**
- * Install product and category OG attributes (og_title, og_description,
- * og_image) under the "Search Engine Optimization" group on every attribute
- * set.
- *
- * Self-sufficient after the split: the "Search Engine Optimization" group
- * is created here if it does not already exist, so this patch no longer
- * depends on Panth_AdvancedSEO's AddSeoNameAttribute patch.
- */
 class AddOgAttributes implements DataPatchInterface
 {
-    /**
-     * @param ModuleDataSetupInterface $moduleDataSetup
-     * @param EavSetupFactory $eavSetupFactory
-     */
     public function __construct(
         private readonly ModuleDataSetupInterface $moduleDataSetup,
         private readonly EavSetupFactory $eavSetupFactory
     ) {
     }
 
-    /**
-     * Apply the data patch.
-     *
-     * @return self
-     */
     public function apply(): self
     {
-        /** @var EavSetup $eavSetup */
         $eavSetup = $this->eavSetupFactory->create(['setup' => $this->moduleDataSetup]);
 
         $ogAttributes = [
@@ -48,7 +29,6 @@ class AddOgAttributes implements DataPatchInterface
             'og_image' => ['label' => 'OG Image URL', 'type' => 'varchar', 'input' => 'text', 'sort' => 70],
         ];
 
-        // Product OG attributes
         foreach ($ogAttributes as $code => $config) {
             if (!$eavSetup->getAttributeId(Product::ENTITY, $code)) {
                 $eavSetup->addAttribute(Product::ENTITY, $code, [
@@ -70,7 +50,6 @@ class AddOgAttributes implements DataPatchInterface
             }
         }
 
-        // Assign product OG attributes to ALL attribute sets
         $productEntityTypeId = $eavSetup->getEntityTypeId(Product::ENTITY);
         $conn = $this->moduleDataSetup->getConnection();
         $attrSets = $conn->fetchCol(
@@ -94,7 +73,6 @@ class AddOgAttributes implements DataPatchInterface
             }
         }
 
-        // Category OG attributes
         foreach ($ogAttributes as $code => $config) {
             if (!$eavSetup->getAttributeId(Category::ENTITY, $code)) {
                 $eavSetup->addAttribute(Category::ENTITY, $code, [
@@ -113,21 +91,11 @@ class AddOgAttributes implements DataPatchInterface
         return $this;
     }
 
-    /**
-     * List patch dependencies.
-     *
-     * @return array<int, string>
-     */
     public static function getDependencies(): array
     {
         return [];
     }
 
-    /**
-     * List historical patch aliases.
-     *
-     * @return array<int, string>
-     */
     public function getAliases(): array
     {
         return [];

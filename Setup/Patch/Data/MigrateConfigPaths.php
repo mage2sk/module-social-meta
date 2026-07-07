@@ -1,9 +1,4 @@
 <?php
-/**
- * Panth — migrate legacy config paths to module-owned section.
- *
- * @copyright Copyright (c) Panth
- */
 declare(strict_types=1);
 
 namespace Panth\SocialMeta\Setup\Patch\Data;
@@ -11,25 +6,16 @@ namespace Panth\SocialMeta\Setup\Patch\Data;
 use Magento\Framework\Setup\ModuleDataSetupInterface;
 use Magento\Framework\Setup\Patch\DataPatchInterface;
 
-/**
- * Migrates core_config_data rows from legacy path prefix to new module-owned prefix.
- */
 class MigrateConfigPaths implements DataPatchInterface
 {
     private const LEGACY_PREFIX = 'panth_seo/social/';
     private const NEW_PREFIX    = 'panth_social_meta/social/';
 
-    /**
-     * @param ModuleDataSetupInterface $moduleDataSetup
-     */
     public function __construct(
         private readonly ModuleDataSetupInterface $moduleDataSetup
     ) {
     }
 
-    /**
-     * @return self
-     */
     public function apply(): self
     {
         $connection = $this->moduleDataSetup->getConnection();
@@ -52,17 +38,11 @@ class MigrateConfigPaths implements DataPatchInterface
         return $this;
     }
 
-    /**
-     * @return array<int,string>
-     */
     public static function getDependencies(): array
     {
         return [];
     }
 
-    /**
-     * @return array<int,string>
-     */
     public function getAliases(): array
     {
         return [];

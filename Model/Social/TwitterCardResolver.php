@@ -6,29 +6,17 @@ namespace Panth\SocialMeta\Model\Social;
 use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Store\Model\ScopeInterface;
 
-/**
- * Resolves Twitter Card meta-tag data by wrapping OpenGraphResolver.
- */
 class TwitterCardResolver
 {
     public const XML_TWITTER_CARD_TYPE = 'panth_social_meta/social/twitter_card_type';
     public const XML_TWITTER_SITE      = 'panth_social_meta/social/twitter_site_handle';
 
-    /**
-     * @param OpenGraphResolver $openGraphResolver
-     * @param ScopeConfigInterface $scopeConfig
-     */
     public function __construct(
         private readonly OpenGraphResolver $openGraphResolver,
         private readonly ScopeConfigInterface $scopeConfig
     ) {
     }
 
-    /**
-     * Resolve Twitter Card tags for the current page.
-     *
-     * @return array<string, string> Keyed by twitter meta name (e.g. "twitter:card").
-     */
     public function resolve(): array
     {
         $ogTags = $this->openGraphResolver->resolve();
@@ -50,11 +38,6 @@ class TwitterCardResolver
         return array_filter($tags, static fn (string $v): bool => $v !== '');
     }
 
-    /**
-     * Get the configured Twitter Card type.
-     *
-     * @return string
-     */
     private function getCardType(): string
     {
         try {
@@ -65,11 +48,6 @@ class TwitterCardResolver
         }
     }
 
-    /**
-     * Get the configured Twitter @handle.
-     *
-     * @return string
-     */
     private function getTwitterSite(): string
     {
         try {

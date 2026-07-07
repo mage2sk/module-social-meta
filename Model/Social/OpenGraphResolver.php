@@ -12,17 +12,6 @@ use Magento\Framework\View\Page\Config as PageConfig;
 use Magento\Store\Model\ScopeInterface;
 use Magento\Store\Model\StoreManagerInterface;
 
-/**
- * Resolves Open Graph meta-tag data from the current page context.
- *
- * NOTE: after the AdvancedSEO split this module is self-contained and
- * no longer depends on Panth\AdvancedSEO\* API interfaces. Canonical
- * URLs are built locally from the entity's own URL model, and meta
- * title/description fall back to the entity's native getMetaTitle() /
- * getMetaDescription() plus the PageConfig title/description set by
- * the controller. Advanced template-rendered meta (rule-engine, template
- * precedence) that lived in Panth_AdvancedSEO is no longer used here.
- */
 class OpenGraphResolver
 {
     public const ENTITY_PRODUCT  = 'product';
@@ -30,12 +19,6 @@ class OpenGraphResolver
 
     public const XML_DEFAULT_OG_IMAGE = 'panth_social_meta/social/default_og_image';
 
-    /**
-     * @param Registry $registry
-     * @param StoreManagerInterface $storeManager
-     * @param ScopeConfigInterface $scopeConfig
-     * @param PageConfig|null $pageConfig Injected as Proxy via di.xml.
-     */
     public function __construct(
         private readonly Registry $registry,
         private readonly StoreManagerInterface $storeManager,
@@ -44,11 +27,6 @@ class OpenGraphResolver
     ) {
     }
 
-    /**
-     * Resolve Open Graph tags for the current page.
-     *
-     * @return array<string, string> Keyed by OG property name (e.g. "og:title").
-     */
     public function resolve(): array
     {
         try {
@@ -69,7 +47,6 @@ class OpenGraphResolver
         $tags['og:site_name']   = $this->resolveSiteName($storeId);
         $tags['og:locale']      = $this->resolveLocale($storeId);
 
-        // Facebook Shop / product-catalog ingesters require product:* tags on PDP.
         if ($entityType === self::ENTITY_PRODUCT) {
             foreach ($this->resolveProductTags() as $property => $value) {
                 $tags[$property] = $value;
@@ -79,11 +56,6 @@ class OpenGraphResolver
         return array_filter($tags, static fn (string $v): bool => $v !== '');
     }
 
-    /**
-     * Locale code formatted the way the OpenGraph spec wants: `en_US`.
-     * Magento stores it as `en_US` internally already, so this is a pure
-     * passthrough with a safe default.
-     */
     private function resolveLocale(int $storeId): string
     {
         try {
@@ -98,13 +70,6 @@ class OpenGraphResolver
         }
     }
 
-    /**
-     * Resolve product:* tags required by Facebook Shop / catalog ingesters
-     * (price, currency, availability). Returns an empty array when no
-     * current_product is in registry or the final price is non-positive.
-     *
-     * @return array<string, string>
-     */
     private function resolveProductTags(): array
     {
         $product = $this->registry->registry('current_product');
@@ -135,12 +100,6 @@ class OpenGraphResolver
             }
         }
 
-        // Availability — required by Facebook Shop, respected by most
-        // product catalog ingesters. Value set is drawn from OpenGraph
-        // product vocab: "instock" / "oos" / "pending" / "discontinued".
-        // We only distinguish in-stock vs out-of-stock; anything richer
-        // would require inventory plumbing beyond the scope of a meta
-        // tag module.
         $isSalable = true;
         if (method_exists($product, 'isSalable')) {
             try {
@@ -151,9 +110,6 @@ class OpenGraphResolver
         }
         $out['product:availability'] = $isSalable ? 'instock' : 'oos';
 
-        // Brand / manufacturer — optional but strongly preferred by
-        // Facebook Shop feed. Read from the standard `manufacturer`
-        // attribute if the install has one set on this product.
         if (method_exists($product, 'getAttributeText')) {
             try {
                 $brand = (string) $product->getAttributeText('manufacturer');
@@ -168,41 +124,11 @@ class OpenGraphResolver
         return $out;
     }
 
-    /**
-     * Map entity type to OG type value.
-     *
-     * Category and CMS pages deliberately map to `website` rather than
-     * `article`: CMS pages on a Magento store are overwhelmingly
-     * informational (About, Contact, FAQ, Shipping Policy) — not blog
-     * articles. Merchants who want `article` semantics on a specific
-     * blog-style page can override via a custom theme/layout; the
-     * default stays safe for the typical store.
-     *
-     * Also: the pre-v1.1 code attempted ENTITY_CMS detection via a
-     * `cms_page` registry key that is only populated by the admin
-     * controller, never by the frontend flow — so the `article`
-     * branch was effectively dead code anyway. Simplifying to the
-     * two branches that actually fire in practice.
-     *
-     * @param string|null $entityType
-     * @return string
-     */
     private function resolveType(?string $entityType): string
     {
         return $entityType === self::ENTITY_PRODUCT ? 'product' : 'website';
     }
 
-    /**
-     * Resolve title from current entity or page config.
-     *
-     * Fallback chain: entity own meta_title -> entity name/title -> page
-     * config title set by controller -> store name. Template-rendered
-     * meta (previously sourced from Panth_AdvancedSEO's MetaResolver) is
-     * no longer available after the split.
-     *
-     * @param string|null $entityType
-     * @return string
-     */
     private function resolveTitle(?string $entityType): string
     {
         $product = $this->registry->registry('current_product');
@@ -223,10 +149,6 @@ class OpenGraphResolver
             return (string) $category->getName();
         }
 
-        // Fallback for CMS pages + custom controllers: prefer the page
-        // title set on PageConfig (populated by the CMS controller from
-        // the page's own meta_title / title) so og:title reflects the
-        // actual page rather than the store name.
         $pageTitle = $this->getPageConfigTitle();
         if ($pageTitle !== '') {
             return $pageTitle;
@@ -238,12 +160,6 @@ class OpenGraphResolver
         }
     }
 
-    /**
-     * Read the current page title from PageConfig, if a controller/plugin
-     * has already set one.
-     *
-     * @return string
-     */
     private function getPageConfigTitle(): string
     {
         if ($this->pageConfig === null) {
@@ -257,12 +173,6 @@ class OpenGraphResolver
         return trim($title);
     }
 
-    /**
-     * Read the current meta description from PageConfig, if a controller/
-     * plugin has already set one.
-     *
-     * @return string
-     */
     private function getPageConfigDescription(): string
     {
         if ($this->pageConfig === null) {
@@ -276,17 +186,6 @@ class OpenGraphResolver
         return trim($desc);
     }
 
-    /**
-     * Resolve meta description from current entity.
-     *
-     * Fallback chain: entity own meta_description -> product short
-     * description / category description -> page config description ->
-     * store default description. Template-rendered meta from Panth_
-     * AdvancedSEO's MetaResolver is no longer consulted after the split.
-     *
-     * @param string|null $entityType
-     * @return string
-     */
     private function resolveDescription(?string $entityType): string
     {
         $product = $this->registry->registry('current_product');
@@ -307,9 +206,6 @@ class OpenGraphResolver
             return $this->truncate((string) $category->getDescription(), 200);
         }
 
-        // CMS + custom-controller pages: use PageConfig description
-        // populated by the controller (pulled from the CMS page's
-        // meta_description field by the CMS controller).
         $pageDesc = $this->getPageConfigDescription();
         if ($pageDesc !== '') {
             return $this->truncate($pageDesc, 200);
@@ -323,14 +219,6 @@ class OpenGraphResolver
         }
     }
 
-    /**
-     * Resolve image URL with progressive fallbacks:
-     *   product image -> category image -> first product in category -> default OG image
-     *   -> store logo -> Magento default product placeholder -> empty.
-     *
-     * @param string|null $entityType
-     * @return string
-     */
     private function resolveImage(?string $entityType): string
     {
         try {
@@ -372,12 +260,6 @@ class OpenGraphResolver
         }
     }
 
-    /**
-     * Get the URL of the first product image in the given category.
-     *
-     * @param int $categoryId
-     * @return string
-     */
     private function getFirstProductImageInCategory(int $categoryId): string
     {
         try {
@@ -403,20 +285,10 @@ class OpenGraphResolver
                 }
             }
         } catch (\Throwable) {
-            // intentionally empty
         }
         return '';
     }
 
-    /**
-     * Get the admin-configured default OG image URL.
-     *
-     * The stored value is a media-relative path saved by the Image backend
-     * under `panth_social_meta/social/`. We reject any value containing
-     * path-traversal sequences and return an absolute media URL when safe.
-     *
-     * @return string
-     */
     private function getDefaultOgImageUrl(): string
     {
         try {
@@ -442,11 +314,6 @@ class OpenGraphResolver
         }
     }
 
-    /**
-     * Get the Magento default product placeholder image URL as the last resort.
-     *
-     * @return string
-     */
     private function getPlaceholderImageUrl(): string
     {
         try {
@@ -462,20 +329,6 @@ class OpenGraphResolver
         }
     }
 
-    /**
-     * Resolve canonical URL for the current entity.
-     *
-     * Previously delegated to Panth_AdvancedSEO's CanonicalResolver which
-     * honoured custom-canonical overrides and parameter strip rules. After
-     * the split we build a minimal canonical locally from the entity's URL
-     * model; pages without a known entity fall back to the current URL with
-     * its query string stripped.
-     *
-     * @param string|null $entityType
-     * @param int $entityId
-     * @param int $storeId
-     * @return string
-     */
     private function resolveUrl(?string $entityType, int $entityId, int $storeId): string
     {
         try {
@@ -498,9 +351,7 @@ class OpenGraphResolver
                     }
                 }
             }
-
         } catch (\Throwable) {
-            // fall through to current URL
         }
 
         try {
@@ -511,12 +362,6 @@ class OpenGraphResolver
         }
     }
 
-    /**
-     * Strip the query string and fragment from a URL for canonical use.
-     *
-     * @param string $url
-     * @return string
-     */
     private function stripQuery(string $url): string
     {
         $q = strpos($url, '?');
@@ -530,16 +375,6 @@ class OpenGraphResolver
         return $url;
     }
 
-    /**
-     * Resolve site name for og:site_name.
-     *
-     * Prefers `general/store_information/name` (the merchant-facing brand
-     * name) over `$store->getName()` which returns the internal store
-     * view label like "Default Store View" — not something a merchant
-     * wants their shoppers to see in a Facebook preview card.
-     *
-     * @return string
-     */
     private function resolveSiteName(int $storeId = 0): string
     {
         try {
@@ -557,11 +392,6 @@ class OpenGraphResolver
         }
     }
 
-    /**
-     * Get the store logo URL from theme configuration.
-     *
-     * @return string
-     */
     private function getStoreLogoUrl(): string
     {
         try {
@@ -572,25 +402,11 @@ class OpenGraphResolver
                 return $mediaUrl . '/logo/' . ltrim((string) $logoSrc, '/');
             }
         } catch (\Throwable) {
-            // intentionally empty
         }
 
         return '';
     }
 
-    /**
-     * Detect the current entity type and ID from the registry.
-     *
-     * Only product + category are reliably registered on the frontend —
-     * the `cms_page` registry key is exclusive to the admin Edit
-     * controller, never populated on storefront requests, so the old
-     * ENTITY_CMS detection path was dead code. CMS pages fall through
-     * to the default type/URL/title path which uses PageConfig (set by
-     * the CMS controller) and the current URL — correct enough for
-     * og:* purposes without the false ENTITY_CMS branching.
-     *
-     * @return array{0: ?string, 1: int}
-     */
     private function detectEntity(): array
     {
         $product = $this->registry->registry('current_product');
@@ -606,17 +422,6 @@ class OpenGraphResolver
         return [null, 0];
     }
 
-    /**
-     * Truncate a string to max length, stripping HTML tags first.
-     *
-     * Uses the single-character ellipsis `…` rather than three dots so
-     * the output is tighter in token terms and matches what Google's
-     * snippet generator + Facebook's preview renderer produce natively.
-     *
-     * @param string $text
-     * @param int $maxLength
-     * @return string
-     */
     private function truncate(string $text, int $maxLength): string
     {
         $text = trim(strip_tags($text));
