@@ -1,11 +1,11 @@
 <?xml version="1.0"?>
 <!--
 /**
- * Panth Social Meta — default layout.
+ * Panth Social Meta - default layout.
  *
  * Registers two head blocks: OpenGraph and TwitterCard. Rendered inside
  * <head> via the `head.additional` container. Templates are cacheable and
- * produce zero JS, zero x-magento-init output — Hyva and Luma safe.
+ * produce zero JS, zero x-magento-init output - Hyva and Luma safe.
  */
 -->
 <page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"

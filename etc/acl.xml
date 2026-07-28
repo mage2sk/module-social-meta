@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!--
 /**
- * Panth Social Meta — ACL.
+ * Panth Social Meta - ACL.
  *
  * Gates the system.xml "Social / Open Graph" group under the standard
  * Stores > Configuration ACL branch.

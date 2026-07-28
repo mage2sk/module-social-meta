@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!--
 /**
- * Panth Social Meta — Default values for panth_seo/social/* fields.
+ * Panth Social Meta - Default values for panth_seo/social/* fields.
  *
  * Defaults are kept on the shared `panth_seo` section so the admin UI
  * stays grouped under Advanced SEO. If AdvancedSEO is not installed,

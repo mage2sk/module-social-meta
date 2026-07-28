@@ -432,6 +432,6 @@ class OpenGraphResolver
             return $text;
         }
 
-        return rtrim(mb_substr($text, 0, $maxLength - 1)) . '…';
+        return rtrim(mb_substr($text, 0, $maxLength - 3)) . '...';
     }
 }

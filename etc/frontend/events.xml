@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!--
 /**
- * Panth Social Meta — Frontend events.
+ * Panth Social Meta - Frontend events.
  *
  * Removes native Magento/Hyva OpenGraph blocks so duplicate og:* tags
  * never render alongside the module's own output.

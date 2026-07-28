@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!--
 /**
- * Panth Social Meta — DI configuration.
+ * Panth Social Meta - DI configuration.
  *
  * OpenGraphResolver needs PageConfig to fall back to the controller-set
  * title/description on routes without a catalog/CMS entity in the

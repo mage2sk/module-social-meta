@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!--
 /**
- * Panth Social Meta — Module declaration.
+ * Panth Social Meta - Module declaration.
  *
  * Self-contained OpenGraph + Twitter Card head-tag emission. After the
  * AdvancedSEO split this module no longer depends on Panth_AdvancedSEO

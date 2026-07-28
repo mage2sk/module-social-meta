@@ -11,7 +11,7 @@
  * Text-valued properties (title, description, site_name, type, locale)
  * use escapeHtml() rather than escapeHtmlAttr() - Magento's
  * escapeHtmlAttr() runs Zend\Escaper which aggressively encodes every
- * non-ASCII-safe byte (e.g. `@` → `&#x40;`, which makes twitter:site
+ * non-ASCII-safe byte (e.g. `@` -> `&#x40;`, which makes twitter:site
  * handles look wrong in view-source even though social scrapers decode
  * entities). escapeHtml() uses htmlspecialchars() with ENT_QUOTES |
  * ENT_HTML5, which properly escapes the five characters that matter

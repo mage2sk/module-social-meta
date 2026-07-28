@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!--
 /**
- * Panth Social Meta — System configuration.
+ * Panth Social Meta - System configuration.
  *
  * Re-declares section `panth_seo` so that Magento merges this group into
  * the existing Advanced SEO section (tab: panth). Only the Social / Open
