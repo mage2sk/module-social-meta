@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Panth Social Meta - Module declaration.
+ *
+ * Self-contained OpenGraph + Twitter Card head-tag emission. After the
+ * AdvancedSEO split this module no longer depends on Panth_AdvancedSEO
+ * and may be installed standalone.
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:Module/etc/module.xsd">
+    <module name="Panth_SocialMeta" setup_version="1.0.0">
+        <sequence>
+            <module name="Panth_Core"/>
+            <module name="Magento_Catalog"/>
+            <module name="Magento_Cms"/>
+        </sequence>
+    </module>
+</config>

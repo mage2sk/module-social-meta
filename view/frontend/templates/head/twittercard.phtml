@@ -1,0 +1,40 @@
+<?php
+/** @var \Panth\SocialMeta\Block\Head\TwitterCard $block */
+/** @var \Magento\Framework\Escaper $escaper */
+
+/**
+ * Panth Social Meta - Twitter Card tag renderer.
+ *
+ * Same escape strategy as the OpenGraph template: URL-valued names go
+ * through escapeUrl() to keep `:` / `/` intact; text-valued names use
+ * escapeHtml() (htmlspecialchars ENT_QUOTES | ENT_HTML5) rather than
+ * escapeHtmlAttr() so printable ASCII like `@` in twitter:site handles
+ * stays readable in view-source.
+ */
+
+if (!$block->isEnabled()) {
+    return;
+}
+
+$tags = $block->getTags();
+if ($tags === []) {
+    return;
+}
+
+$urlNames = [
+    'twitter:image'     => true,
+    'twitter:image:src' => true,
+    'twitter:player'    => true,
+];
+
+foreach ($tags as $name => $content) {
+    $content = trim((string) $content);
+    if ($content === '') {
+        continue;
+    }
+    if (isset($urlNames[$name])) {
+        echo '<meta name="' . $escaper->escapeHtml($name) . '" content="' . $escaper->escapeUrl($content) . '" />' . "\n";
+    } else {
+        echo '<meta name="' . $escaper->escapeHtml($name) . '" content="' . $escaper->escapeHtml($content) . '" />' . "\n";
+    }
+}

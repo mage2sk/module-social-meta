@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<form xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Ui:etc/ui_configuration.xsd">
+    <fieldset name="search_engine_optimization">
+        <field name="og_title" sortOrder="200" formElement="input">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="source" xsi:type="string">category</item>
+                </item>
+            </argument>
+            <settings>
+                <dataType>string</dataType>
+                <label translate="true">OG Title</label>
+                <notice translate="true">Title shown when this category is shared on social networks. Leave empty to use the meta title or the category name.</notice>
+            </settings>
+        </field>
+        <field name="og_description" sortOrder="210" formElement="textarea">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="source" xsi:type="string">category</item>
+                </item>
+            </argument>
+            <settings>
+                <dataType>string</dataType>
+                <label translate="true">OG Description</label>
+                <notice translate="true">Description shown in social previews. Leave empty to use the meta description or the category description. The first 200 characters are used.</notice>
+            </settings>
+        </field>
+        <field name="og_image" sortOrder="220" formElement="input">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="source" xsi:type="string">category</item>
+                </item>
+            </argument>
+            <settings>
+                <dataType>string</dataType>
+                <label translate="true">OG Image URL</label>
+                <notice translate="true">Absolute https:// URL or a path relative to the media folder, for example catalog/category/share.jpg. Recommended size 1200 x 630 px. Leave empty to use the category image.</notice>
+            </settings>
+        </field>
+    </fieldset>
+</form>
